@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-// Giriş kontrolü
+// Şifre
 define('SIFRE', 'CDNmutluhosting');
 
 // Logout
@@ -27,846 +27,283 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DASSY TAG | Ultra Profesyonel Sorgu Paneli</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>DASSY TAG | Sorgu Paneli</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* ===== RESET & VARIABLES ===== */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-        }
-
-        :root {
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --primary-light: #818cf8;
-            --secondary: #8b5cf6;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --dark: #0f172a;
-            --darker: #020617;
-            --light: #f8fafc;
-            --gray-50: #f9fafb;
-            --gray-100: #f3f4f6;
-            --gray-200: #e5e7eb;
-            --gray-300: #d1d5db;
-            --gray-400: #9ca3af;
-            --gray-500: #6b7280;
-            --gray-600: #4b5563;
-            --gray-700: #374151;
-            --gray-800: #1f2937;
-            --gray-900: #111827;
+            font-family: 'Inter', sans-serif;
         }
 
         body {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            position: relative;
         }
 
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.1"><path d="M10 10 L90 10 L90 90 L10 90 Z" fill="none" stroke="white" stroke-width="2"/><circle cx="50" cy="50" r="20" fill="none" stroke="white" stroke-width="2"/></svg>') repeat;
-            pointer-events: none;
-            z-index: -1;
-        }
-
-        /* ===== LOGIN PAGE ===== */
-        .login-wrapper {
-            min-height: 100vh;
+        /* Login */
+        .login-container {
             display: flex;
-            align-items: center;
             justify-content: center;
+            align-items: center;
+            min-height: 100vh;
             padding: 20px;
-            position: relative;
-            z-index: 1;
         }
 
-        .login-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 40px;
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+        .login-box {
+            background: white;
+            border-radius: 30px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.3);
             padding: 50px;
             width: 100%;
-            max-width: 450px;
-            animation: floatIn 0.8s cubic-bezier(0.23, 1, 0.32, 1);
-            transform-origin: center;
+            max-width: 400px;
         }
 
-        @keyframes floatIn {
-            0% {
-                opacity: 0;
-                transform: scale(0.9) translateY(30px);
-            }
-            100% {
-                opacity: 1;
-                transform: scale(1) translateY(0);
-            }
-        }
-
-        .login-logo {
+        .logo {
             text-align: center;
             margin-bottom: 40px;
         }
 
-        .login-logo i {
-            font-size: 70px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 10px 20px rgba(99, 102, 241, 0.3));
+        .logo i {
+            font-size: 60px;
+            color: #667eea;
         }
 
-        .login-logo h1 {
-            font-size: 36px;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+        .logo h1 {
+            font-size: 32px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin: 15px 0 5px;
-            letter-spacing: -1px;
         }
 
-        .login-logo p {
-            color: var(--gray-500);
-            font-size: 14px;
-            font-weight: 500;
+        .input-group {
+            margin-bottom: 20px;
         }
 
-        .login-input-group {
-            margin-bottom: 25px;
-            position: relative;
-        }
-
-        .login-input-group i {
-            position: absolute;
-            left: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--gray-400);
-            font-size: 18px;
-            transition: all 0.3s;
-            z-index: 1;
-        }
-
-        .login-input-group input {
+        .input-group input {
             width: 100%;
-            padding: 18px 20px 18px 50px;
-            border: 2px solid var(--gray-200);
-            border-radius: 20px;
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
             font-size: 16px;
-            font-weight: 500;
-            transition: all 0.3s;
-            background: white;
         }
 
-        .login-input-group input:focus {
-            border-color: var(--primary);
+        .input-group input:focus {
+            border-color: #667eea;
             outline: none;
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
-        }
-
-        .login-input-group input:focus + i {
-            color: var(--primary);
         }
 
         .login-btn {
             width: 100%;
-            padding: 18px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
             border: none;
-            border-radius: 20px;
+            border-radius: 15px;
             color: white;
             font-size: 16px;
-            font-weight: 700;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .login-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            transition: left 0.5s;
-        }
-
-        .login-btn:hover::before {
-            left: 100%;
         }
 
         .login-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 30px rgba(99, 102, 241, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102,126,234,0.4);
         }
 
-        .login-btn:active {
-            transform: translateY(-1px);
-        }
-
-        .login-error {
-            background: linear-gradient(135deg, #fee2e2, #fecaca);
-            color: var(--danger);
-            padding: 15px 20px;
-            border-radius: 20px;
-            margin-bottom: 25px;
-            font-size: 14px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            border: 1px solid #fecaca;
-            animation: shake 0.5s;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-            20%, 40%, 60%, 80% { transform: translateX(5px); }
-        }
-
-        .login-info {
+        .error {
+            background: #fee;
+            color: #e74c3c;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 20px;
             text-align: center;
-            margin-top: 30px;
-            color: var(--gray-500);
-            font-size: 13px;
-            font-weight: 500;
         }
 
-        .login-info i {
-            color: var(--primary);
-            margin-right: 5px;
-        }
-
-        /* ===== DASHBOARD ===== */
+        /* Dashboard */
         .dashboard {
-            min-height: 100vh;
-            background: var(--gray-50);
-            position: relative;
-        }
-
-        /* Hamburger Menu */
-        .hamburger {
-            position: fixed;
-            top: 25px;
-            left: 25px;
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border: none;
-            border-radius: 20px;
-            color: white;
-            font-size: 24px;
-            cursor: pointer;
-            z-index: 1001;
-            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .hamburger:hover {
-            transform: scale(1.1) rotate(90deg);
-            box-shadow: 0 15px 35px rgba(99, 102, 241, 0.4);
-        }
-
-        .hamburger.active {
-            left: 315px;
-        }
-
-        /* Sidebar */
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: -350px;
-            width: 350px;
-            height: 100vh;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            box-shadow: 20px 0 40px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
-            transition: left 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-            display: flex;
-            flex-direction: column;
-            border-right: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .sidebar.open {
-            left: 0;
-        }
-
-        .sidebar-header {
-            padding: 40px 30px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .sidebar-header i {
-            font-size: 50px;
-            margin-bottom: 15px;
-            filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.2));
-        }
-
-        .sidebar-header h2 {
-            font-size: 28px;
-            font-weight: 800;
-            margin-bottom: 5px;
-            letter-spacing: -0.5px;
-        }
-
-        .sidebar-header p {
-            font-size: 14px;
-            opacity: 0.9;
-            font-weight: 500;
-        }
-
-        .user-badge {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 12px 20px;
-            border-radius: 15px;
-            margin-top: 20px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            backdrop-filter: blur(5px);
-        }
-
-        .user-badge i {
-            font-size: 24px;
-            margin: 0;
-        }
-
-        .user-badge span {
-            font-weight: 600;
-        }
-
-        .sidebar-search {
-            padding: 20px;
-            position: relative;
-        }
-
-        .sidebar-search i {
-            position: absolute;
-            left: 35px;
-            top: 35px;
-            color: var(--gray-400);
-            font-size: 16px;
-        }
-
-        .sidebar-search input {
-            width: 100%;
-            padding: 15px 15px 15px 45px;
-            border: 2px solid var(--gray-200);
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 500;
-            transition: all 0.3s;
-        }
-
-        .sidebar-search input:focus {
-            border-color: var(--primary);
-            outline: none;
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
-        }
-
-        .sidebar-menu {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-        }
-
-        .menu-category {
-            font-size: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--gray-400);
-            margin: 25px 0 15px;
-            padding-left: 15px;
-        }
-
-        .menu-category:first-of-type {
-            margin-top: 0;
-        }
-
-        .menu-item {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 12px 15px;
-            border-radius: 15px;
-            color: var(--gray-700);
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s;
-            margin-bottom: 5px;
-            cursor: pointer;
-        }
-
-        .menu-item i {
-            width: 24px;
-            font-size: 18px;
-            color: var(--gray-500);
-            transition: all 0.3s;
-        }
-
-        .menu-item:hover {
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
-            transform: translateX(5px);
-        }
-
-        .menu-item:hover i {
-            color: var(--primary);
-            transform: scale(1.1);
-        }
-
-        .menu-item.active {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);
-        }
-
-        .menu-item.active i {
-            color: white;
-        }
-
-        .badge {
-            margin-left: auto;
-            background: rgba(255, 255, 255, 0.2);
-            padding: 4px 10px;
-            border-radius: 40px;
-            font-size: 11px;
-            font-weight: 600;
-        }
-
-        .sidebar-footer {
-            padding: 25px;
-            border-top: 2px solid var(--gray-100);
-        }
-
-        .logout-menu-btn {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 15px;
-            background: var(--gray-100);
-            border: none;
-            border-radius: 15px;
-            color: var(--danger);
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            width: 100%;
-        }
-
-        .logout-menu-btn:hover {
-            background: #fee2e2;
-            transform: translateX(5px);
-        }
-
-        /* Overlay */
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(5px);
-            z-index: 999;
-            display: none;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .overlay.show {
-            display: block;
-            opacity: 1;
-        }
-
-        /* Main Content */
-        .main-content {
-            margin-left: 0;
-            padding: 30px;
-            transition: margin-left 0.3s;
-            max-width: 1400px;
+            max-width: 1200px;
             margin: 0 auto;
+            padding: 30px;
         }
 
-        .main-content.shifted {
-            margin-left: 350px;
-        }
-
-        /* Top Bar */
-        .top-bar {
+        .header {
             background: white;
-            border-radius: 30px;
+            border-radius: 20px;
             padding: 20px 30px;
             margin-bottom: 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
 
-        .page-title {
-            display: flex;
-            align-items: center;
-            gap: 15px;
+        .header h1 {
+            font-size: 24px;
+            color: #2c3e50;
         }
 
-        .page-title i {
-            font-size: 28px;
-            color: var(--primary);
-            background: rgba(99, 102, 241, 0.1);
-            padding: 12px;
-            border-radius: 20px;
+        .header h1 i {
+            color: #667eea;
+            margin-right: 10px;
         }
 
-        .page-title h1 {
-            font-size: 26px;
-            font-weight: 800;
-            color: var(--gray-800);
-            letter-spacing: -0.5px;
-        }
-
-        .page-title p {
-            color: var(--gray-500);
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .user-menu {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .status-badge {
-            background: linear-gradient(135deg, #d1fae5, #a7f3d0);
-            padding: 8px 20px;
-            border-radius: 40px;
-            font-weight: 700;
-            color: #065f46;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            border: 1px solid #6ee7b7;
-        }
-
-        .status-badge i {
-            color: #10b981;
-        }
-
-        .hamburger-top {
-            display: none;
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+        .logout-btn {
+            background: #fee;
+            color: #e74c3c;
             border: none;
-            border-radius: 15px;
-            color: white;
-            font-size: 20px;
-            cursor: pointer;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* Stats Cards */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 25px;
-            margin-bottom: 40px;
-        }
-
-        .stat-card {
-            background: white;
-            border-radius: 30px;
-            padding: 25px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            transition: all 0.3s;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 5px;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.15);
-        }
-
-        .stat-icon {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-
-        .stat-icon i {
-            font-size: 28px;
-            color: var(--primary);
-        }
-
-        .stat-value {
-            font-size: 36px;
-            font-weight: 800;
-            color: var(--gray-800);
-            margin-bottom: 5px;
-            letter-spacing: -1px;
-        }
-
-        .stat-label {
-            color: var(--gray-500);
+            padding: 10px 20px;
+            border-radius: 10px;
             font-weight: 600;
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            cursor: pointer;
+            text-decoration: none;
         }
 
-        /* Quick Actions */
         .quick-actions {
-            background: white;
-            border-radius: 30px;
-            padding: 30px;
-            margin-bottom: 40px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-        }
-
-        .quick-actions h2 {
-            font-size: 22px;
-            font-weight: 800;
-            color: var(--gray-800);
-            margin-bottom: 25px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .quick-actions h2 i {
-            color: var(--primary);
-        }
-
-        .quick-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 15px;
+            margin-bottom: 30px;
         }
 
         .quick-btn {
+            background: white;
+            border: none;
+            border-radius: 15px;
             padding: 20px;
-            background: linear-gradient(135deg, var(--gray-50), white);
-            border: 2px solid var(--gray-200);
-            border-radius: 20px;
             cursor: pointer;
             transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 12px;
-            font-weight: 700;
-            color: var(--gray-700);
+            gap: 10px;
         }
 
         .quick-btn i {
             font-size: 28px;
-            color: var(--primary);
-            transition: all 0.3s;
+            color: #667eea;
         }
 
         .quick-btn:hover {
-            border-color: var(--primary);
             transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.2);
+            box-shadow: 0 10px 25px rgba(102,126,234,0.3);
         }
 
-        .quick-btn:hover i {
-            transform: scale(1.1);
-        }
-
-        .quick-btn.premium {
-            background: linear-gradient(135deg, #fef3c7, #fde68a);
-            border-color: #fbbf24;
-        }
-
-        .quick-btn.premium i {
-            color: #d97706;
-        }
-
-        /* Query Section */
-        .query-section {
+        .query-box {
             background: white;
-            border-radius: 30px;
+            border-radius: 20px;
             padding: 30px;
-            margin-bottom: 40px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
 
-        .query-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-        }
-
-        .query-header h2 {
-            font-size: 22px;
-            font-weight: 800;
-            color: var(--gray-800);
+        .query-type {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
         }
 
-        .query-header h2 i {
-            color: var(--primary);
+        .query-type i {
+            font-size: 32px;
+            color: #667eea;
+            background: rgba(102,126,234,0.1);
+            padding: 15px;
+            border-radius: 15px;
         }
 
-        .query-type-badge {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+        .query-type h2 {
+            font-size: 24px;
+            color: #2c3e50;
+        }
+
+        .query-type span {
+            background: #667eea;
             color: white;
-            padding: 8px 20px;
-            border-radius: 40px;
-            font-weight: 700;
+            padding: 5px 15px;
+            border-radius: 30px;
             font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            margin-left: auto;
         }
 
-        .query-input-group {
+        .input-area {
             display: flex;
             gap: 15px;
             margin-bottom: 20px;
         }
 
-        .query-input-group input {
+        .input-area input {
             flex: 1;
-            padding: 18px 25px;
-            border: 2px solid var(--gray-200);
-            border-radius: 25px;
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
             font-size: 16px;
-            font-weight: 500;
-            transition: all 0.3s;
         }
 
-        .query-input-group input:focus {
-            border-color: var(--primary);
+        .input-area input:focus {
+            border-color: #667eea;
             outline: none;
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
         }
 
-        .query-input-group button {
-            padding: 18px 35px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+        .input-area button {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
             border: none;
-            border-radius: 25px;
+            border-radius: 15px;
             color: white;
-            font-weight: 700;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
             display: flex;
             align-items: center;
             gap: 10px;
-            font-size: 16px;
         }
 
-        .query-input-group button:hover:not(:disabled) {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 30px rgba(99, 102, 241, 0.3);
+        .input-area button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102,126,234,0.4);
         }
 
-        .query-input-group button:disabled {
+        .input-area button:disabled {
             opacity: 0.5;
             cursor: not-allowed;
         }
 
-        .query-example {
-            background: var(--gray-50);
-            border-radius: 20px;
-            padding: 15px 20px;
-            color: var(--gray-600);
+        .example {
+            color: #7f8c8d;
             font-size: 14px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            border: 1px dashed var(--gray-300);
+            margin-bottom: 20px;
         }
 
-        .query-example i {
-            color: var(--primary);
-        }
-
-        /* Loader */
-        .query-loader {
-            text-align: center;
-            padding: 40px;
+        .loader {
             display: none;
+            text-align: center;
+            padding: 30px;
         }
 
         .spinner {
             width: 50px;
             height: 50px;
-            border: 4px solid var(--gray-200);
-            border-top-color: var(--primary);
+            border: 4px solid #f3f3f3;
+            border-top-color: #667eea;
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
+            margin: 0 auto 15px;
         }
 
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
 
-        .query-loader p {
-            color: var(--gray-600);
-            font-weight: 600;
-        }
-
-        /* Result Container */
-        .result-container {
-            background: var(--gray-50);
-            border-radius: 25px;
-            padding: 25px;
-            margin-top: 25px;
-            border: 2px solid var(--gray-200);
+        .result {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
             display: none;
         }
 
@@ -874,20 +311,14 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         .result-header h3 {
-            font-size: 18px;
-            font-weight: 800;
-            color: var(--gray-800);
             display: flex;
             align-items: center;
             gap: 10px;
-        }
-
-        .result-header h3 i {
-            color: var(--success);
+            color: #27ae60;
         }
 
         .result-actions {
@@ -896,938 +327,465 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
         }
 
         .result-actions button {
-            padding: 10px 20px;
-            border: 2px solid var(--gray-200);
+            padding: 8px 15px;
+            border: 2px solid #e0e0e0;
             background: white;
-            border-radius: 15px;
-            font-weight: 600;
+            border-radius: 10px;
             cursor: pointer;
-            transition: all 0.3s;
             display: flex;
             align-items: center;
-            gap: 8px;
-            color: var(--gray-700);
+            gap: 5px;
         }
 
         .result-actions button:hover {
-            border-color: var(--primary);
-            color: var(--primary);
-            transform: translateY(-2px);
+            border-color: #667eea;
+            color: #667eea;
         }
 
         .result-content {
             background: white;
-            border-radius: 20px;
-            padding: 25px;
+            border-radius: 10px;
+            padding: 20px;
             font-family: 'Courier New', monospace;
             font-size: 14px;
-            line-height: 1.8;
-            max-height: 500px;
+            line-height: 1.6;
+            max-height: 400px;
             overflow-y: auto;
-            border: 1px solid var(--gray-200);
             white-space: pre-wrap;
             word-wrap: break-word;
         }
 
-        .small-result {
-            background: linear-gradient(135deg, #f0f9ff, #e6f0fa);
-            border-left: 5px solid var(--primary);
+        .result-content.small {
+            background: #f0f9ff;
+            border-left: 5px solid #667eea;
         }
 
-        /* Recent Queries */
-        .recent-section {
+        .recent {
             background: white;
-            border-radius: 30px;
+            border-radius: 20px;
             padding: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
 
-        .recent-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-        }
-
-        .recent-header h2 {
-            font-size: 22px;
-            font-weight: 800;
-            color: var(--gray-800);
+        .recent h2 {
             display: flex;
             align-items: center;
             gap: 10px;
-        }
-
-        .recent-header h2 i {
-            color: var(--primary);
-        }
-
-        .clear-recent {
-            padding: 10px 20px;
-            background: var(--gray-100);
-            border: none;
-            border-radius: 15px;
-            color: var(--gray-600);
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .clear-recent:hover {
-            background: #fee2e2;
-            color: var(--danger);
+            margin-bottom: 20px;
+            color: #2c3e50;
         }
 
         .recent-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
             gap: 15px;
         }
 
         .recent-item {
-            background: var(--gray-50);
-            border-radius: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
             padding: 15px;
             cursor: pointer;
             transition: all 0.3s;
-            border: 2px solid transparent;
         }
 
         .recent-item:hover {
-            border-color: var(--primary);
+            background: #edf2f7;
             transform: translateX(5px);
-            background: white;
-        }
-
-        .recent-item-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
         }
 
         .recent-type {
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
-            padding: 5px 12px;
-            border-radius: 30px;
+            background: #667eea;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 20px;
             font-size: 11px;
-            font-weight: 700;
-            color: var(--primary);
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+
+        .recent-param {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
         }
 
         .recent-time {
             font-size: 11px;
-            color: var(--gray-400);
-            font-weight: 500;
-        }
-
-        .recent-param {
-            font-weight: 700;
-            color: var(--gray-800);
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
-
-        .recent-preview {
-            font-size: 12px;
-            color: var(--gray-500);
-            overflow: hidden;
-            text-overflow: ellipsis;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-        }
-
-        /* Responsive */
-        @media (max-width: 1024px) {
-            .main-content.shifted {
-                margin-left: 0;
-            }
-            
-            .sidebar {
-                width: 300px;
-            }
-            
-            .hamburger.active {
-                left: 275px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .hamburger {
-                display: flex;
-            }
-            
-            .hamburger-top {
-                display: flex;
-            }
-            
-            .top-bar {
-                flex-direction: column;
-                gap: 20px;
-                align-items: flex-start;
-            }
-            
-            .query-input-group {
-                flex-direction: column;
-            }
-            
-            .quick-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            
-            .recent-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .result-header {
-                flex-direction: column;
-                gap: 15px;
-                align-items: flex-start;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .quick-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Animations */
-        .fade-in {
-            animation: fadeIn 0.5s;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .slide-in {
-            animation: slideIn 0.3s;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        /* Toast */
-        .toast {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: white;
-            border-radius: 20px;
-            padding: 15px 25px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            z-index: 9999;
-            animation: slideUp 0.3s;
-            border-left: 5px solid var(--success);
-        }
-
-        .toast.error {
-            border-left-color: var(--danger);
-        }
-
-        .toast i {
-            font-size: 24px;
-            color: var(--success);
-        }
-
-        .toast.error i {
-            color: var(--danger);
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            color: #7f8c8d;
         }
     </style>
 </head>
 <body>
     <?php if (!$giris_yapildi): ?>
-    <!-- LOGIN SAYFASI -->
-    <div class="login-wrapper">
-        <div class="login-card">
-            <div class="login-logo">
+    <!-- LOGIN -->
+    <div class="login-container">
+        <div class="login-box">
+            <div class="logo">
                 <i class="fas fa-shield-hal"></i>
                 <h1>DASSY TAG</h1>
-                <p>Profesyonel Sorgu Paneli v2.0</p>
+                <p>Profesyonel Sorgu Paneli</p>
             </div>
             
             <?php if (isset($hata)): ?>
-                <div class="login-error">
-                    <i class="fas fa-exclamation-circle"></i>
-                    <?= $hata ?>
+                <div class="error">
+                    <i class="fas fa-exclamation-circle"></i> <?= $hata ?>
                 </div>
             <?php endif; ?>
             
             <form method="POST">
-                <div class="login-input-group">
-                    <i class="fas fa-lock"></i>
-                    <input type="password" name="password" placeholder="Şifre" required autofocus>
+                <div class="input-group">
+                    <input type="password" name="password" placeholder="Şifre" required>
                 </div>
-                <button type="submit" name="login" class="login-btn">
-                    <i class="fas fa-sign-in-alt"></i>
-                    GİRİŞ YAP
-                </button>
+                <button type="submit" name="login" class="login-btn">GİRİŞ YAP</button>
             </form>
-            
-            <div class="login-info">
-                <i class="fas fa-info-circle"></i>
-                Yetkili kullanıcılar içindir
-            </div>
         </div>
     </div>
     
     <?php else: ?>
     <!-- DASHBOARD -->
     <div class="dashboard">
-        <!-- Hamburger Menu -->
-        <button class="hamburger" id="hamburgerBtn">
-            <i class="fas fa-bars"></i>
-        </button>
-        
-        <!-- Overlay -->
-        <div class="overlay" id="overlay"></div>
-        
-        <!-- Sidebar -->
-        <div class="sidebar" id="sidebar">
-            <div class="sidebar-header">
+        <div class="header">
+            <h1>
                 <i class="fas fa-shield-hal"></i>
-                <h2>DASSY TAG</h2>
-                <p>Profesyonel Sorgu Sistemi</p>
-                <div class="user-badge">
-                    <i class="fas fa-user-cog"></i>
-                    <div>
-                        <span>Admin Kullanıcı</span>
-                        <p style="font-size: 11px; opacity: 0.8;">Yetkili Panel</p>
+                DASSY TAG Sorgu Paneli
+            </h1>
+            <a href="?logout=1" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i> Çıkış
+            </a>
+        </div>
+        
+        <!-- Hızlı Butonlar -->
+        <div class="quick-actions">
+            <button class="quick-btn" onclick="setType('tc')">
+                <i class="fas fa-id-card"></i>
+                <span>TC</span>
+            </button>
+            <button class="quick-btn" onclick="setType('gsm')">
+                <i class="fas fa-mobile-alt"></i>
+                <span>GSM</span>
+            </button>
+            <button class="quick-btn" onclick="setType('ad')">
+                <i class="fas fa-user"></i>
+                <span>Ad-Soyad</span>
+            </button>
+            <button class="quick-btn" onclick="setType('aile')">
+                <i class="fas fa-users"></i>
+                <span>Aile</span>
+            </button>
+            <button class="quick-btn" onclick="setType('plaka')">
+                <i class="fas fa-car"></i>
+                <span>Plaka</span>
+            </button>
+        </div>
+        
+        <!-- Sorgu Kutusu -->
+        <div class="query-box">
+            <div class="query-type">
+                <i class="fas fa-id-card" id="typeIcon"></i>
+                <h2 id="typeTitle">TC Sorgulama</h2>
+                <span id="typeBadge">tc</span>
+            </div>
+            
+            <div class="input-area">
+                <input type="text" id="queryParam" placeholder="Parametre girin..." onkeypress="if(event.key==='Enter') executeQuery()">
+                <button onclick="executeQuery()" id="queryBtn">
+                    <i class="fas fa-search"></i>
+                    Sorgula
+                </button>
+            </div>
+            
+            <div class="example" id="queryExample">
+                <i class="fas fa-info-circle"></i> Örnek: 12345678901
+            </div>
+            
+            <!-- Loader -->
+            <div class="loader" id="queryLoader">
+                <div class="spinner"></div>
+                <p>Sorgulanıyor... (max 30 saniye)</p>
+            </div>
+            
+            <!-- Sonuç -->
+            <div class="result" id="resultContainer">
+                <div class="result-header">
+                    <h3>
+                        <i class="fas fa-check-circle"></i>
+                        Sorgu Sonucu
+                    </h3>
+                    <div class="result-actions">
+                        <button onclick="copyResult()">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                        <button onclick="downloadResult()">
+                            <i class="fas fa-download"></i>
+                        </button>
                     </div>
                 </div>
-            </div>
-            
-            <div class="sidebar-search">
-                <i class="fas fa-search"></i>
-                <input type="text" id="menuSearch" placeholder="Sorgu ara..." onkeyup="filterMenu()">
-            </div>
-            
-            <div class="sidebar-menu" id="menuItems">
-                <div class="menu-category">HIZLI ERİŞİM</div>
-                <div class="menu-item" onclick="setQueryType('tc')">
-                    <i class="fas fa-id-card"></i>
-                    <span>TC Sorgu</span>
-                    <span class="badge">Hızlı</span>
-                </div>
-                <div class="menu-item" onclick="setQueryType('gsm')">
-                    <i class="fas fa-mobile-alt"></i>
-                    <span>GSM Sorgu</span>
-                    <span class="badge">Hızlı</span>
-                </div>
-                <div class="menu-item" onclick="setQueryType('ad')">
-                    <i class="fas fa-user"></i>
-                    <span>Ad-Soyad</span>
-                    <span class="badge">Hızlı</span>
-                </div>
-                
-                <div class="menu-category">TC KİMLİK</div>
-                <div class="menu-item" onclick="setQueryType('tc')">
-                    <i class="fas fa-id-card"></i>
-                    <span>TC Sorgu</span>
-                </div>
-                <div class="menu-item" onclick="setQueryType('tc2')">
-                    <i class="fas fa-id-card"></i>
-                    <span>TC Detaylı</span>
-                </div>
-                <div class="menu-item" onclick="setQueryType('tc-ikametgah')">
-                    <i class="fas fa-map-marker-alt"></i>
-                    <span>İkametgah</span>
-                </div>
-                <div class="menu-item" onclick="setQueryType('vesika')">
-                    <i class="fas fa-id-card"></i>
-                    <span>Vesika</span>
-                </div>
-                
-                <div class="menu-category">GSM</div>
-                <div class="menu-item" onclick="setQueryType('gsm')">
-                    <i class="fas fa-mobile-alt"></i>
-                    <span>GSM Sorgu</span>
-                </div>
-                <div class="menu-item" onclick="setQueryType('gsm2')">
-                    <i class="fas fa-mobile-alt"></i>
-                    <span>GSM Detaylı</span>
-                </div>
-                
-                <div class="menu-category">İSİM</div>
-                <div class="menu-item" onclick="setQueryType('ad')">
-                    <i class="fas fa-user"></i>
-                    <span>Ad-Soyad Sorgu</span>
-                </div>
-                
-                <div class="menu-category">AİLE</div>
-                <div class="menu-item" onclick="setQueryType('aile')">
-                    <i class="fas fa-users"></i>
-                    <span>Aile Sorgu</span>
-                </div>
-                <div class="menu-item" onclick="setQueryType('sulale')">
-                    <i class="fas fa-tree"></i>
-                    <span>Sülale Sorgu</span>
-                </div>
-                <div class="menu-item" onclick="setQueryType('hane')">
-                    <i class="fas fa-home"></i>
-                    <span>Hane Sorgu</span>
-                </div>
-                
-                <div class="menu-category">DİĞER</div>
-                <div class="menu-item" onclick="setQueryType('isyeri')">
-                    <i class="fas fa-briefcase"></i>
-                    <span>İş Yeri</span>
-                </div>
-                <div class="menu-item" onclick="setQueryType('plaka')">
-                    <i class="fas fa-car"></i>
-                    <span>Plaka</span>
-                </div>
-            </div>
-            
-            <div class="sidebar-footer">
-                <a href="?logout=1" class="logout-menu-btn">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>Çıkış Yap</span>
-                </a>
+                <div class="result-content" id="resultContent"></div>
             </div>
         </div>
         
-        <!-- Main Content -->
-        <div class="main-content" id="mainContent">
-            <!-- Top Bar -->
-            <div class="top-bar">
-                <div class="page-title">
-                    <i class="fas fa-shield-hal"></i>
-                    <div>
-                        <h1 id="pageTitle">DASSY TAG Sorgu Paneli</h1>
-                        <p id="pageSubtitle">Profesyonel veri sorgulama sistemi</p>
-                    </div>
-                </div>
-                <div class="user-menu">
-                    <div class="status-badge">
-                        <i class="fas fa-circle"></i>
-                        <span>ONLINE</span>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Stats Grid -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-bolt"></i>
-                    </div>
-                    <div class="stat-value">16</div>
-                    <div class="stat-label">API Sayısı</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-clock"></i>
-                    </div>
-                    <div class="stat-value">40s</div>
-                    <div class="stat-label">Timeout</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-infinity"></i>
-                    </div>
-                    <div class="stat-value">∞</div>
-                    <div class="stat-label">Sınırsız</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-shield"></i>
-                    </div>
-                    <div class="stat-value">SSL</div>
-                    <div class="stat-label">Güvenli</div>
-                </div>
-            </div>
-            
-            <!-- Quick Actions -->
-            <div class="quick-actions">
-                <h2>
-                    <i class="fas fa-bolt"></i>
-                    Hızlı Giriş Butonları
-                </h2>
-                <div class="quick-grid">
-                    <div class="quick-btn" onclick="setQueryType('tc')">
-                        <i class="fas fa-id-card"></i>
-                        <span>TC Sorgu</span>
-                    </div>
-                    <div class="quick-btn" onclick="setQueryType('gsm')">
-                        <i class="fas fa-mobile-alt"></i>
-                        <span>GSM Sorgu</span>
-                    </div>
-                    <div class="quick-btn" onclick="setQueryType('ad')">
-                        <i class="fas fa-user"></i>
-                        <span>Ad-Soyad</span>
-                    </div>
-                    <div class="quick-btn premium" onclick="setQueryType('aile')">
-                        <i class="fas fa-users"></i>
-                        <span>Aile</span>
-                    </div>
-                    <div class="quick-btn" onclick="setQueryType('plaka')">
-                        <i class="fas fa-car"></i>
-                        <span>Plaka</span>
-                    </div>
-                    <div class="quick-btn premium" onclick="setQueryType('sulale')">
-                        <i class="fas fa-tree"></i>
-                        <span>Sülale</span>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Query Section -->
-            <div class="query-section">
-                <div class="query-header">
-                    <h2>
-                        <i class="fas fa-search" id="queryIcon"></i>
-                        <span id="queryTitle">TC Sorgulama</span>
-                    </h2>
-                    <div class="query-type-badge" id="queryTypeBadge">
-                        <i class="fas fa-id-card"></i>
-                        <span id="currentType">tc</span>
-                    </div>
-                </div>
-                
-                <div class="query-input-group">
-                    <input type="text" id="queryParam" placeholder="Parametre girin..." onkeypress="if(event.key==='Enter') executeQuery()">
-                    <button onclick="executeQuery()" id="queryBtn">
-                        <i class="fas fa-search"></i>
-                        Sorgula
-                    </button>
-                </div>
-                
-                <div class="query-example" id="queryExample">
-                    <i class="fas fa-info-circle"></i>
-                    Örnek: 12345678901
-                </div>
-                
-                <!-- Loader -->
-                <div class="query-loader" id="queryLoader">
-                    <div class="spinner"></div>
-                    <p>Sorgulanıyor... (max 40 saniye)</p>
-                </div>
-                
-                <!-- Result -->
-                <div class="result-container" id="resultContainer">
-                    <div class="result-header">
-                        <h3>
-                            <i class="fas fa-check-circle"></i>
-                            Sorgu Sonucu
-                        </h3>
-                        <div class="result-actions">
-                            <button onclick="copyResult()">
-                                <i class="fas fa-copy"></i>
-                                Kopyala
-                            </button>
-                            <button onclick="downloadResult()" id="downloadBtn">
-                                <i class="fas fa-download"></i>
-                                TXT İndir
-                            </button>
-                        </div>
-                    </div>
-                    <div class="result-content" id="resultContent"></div>
-                </div>
-            </div>
-            
-            <!-- Recent Queries -->
-            <div class="recent-section">
-                <div class="recent-header">
-                    <h2>
-                        <i class="fas fa-history"></i>
-                        Son Sorgular
-                    </h2>
-                    <button class="clear-recent" onclick="clearRecent()">
-                        <i class="fas fa-trash"></i>
-                        Temizle
-                    </button>
-                </div>
-                <div class="recent-grid" id="recentGrid">
-                    <!-- Recent items will be added here -->
-                </div>
+        <!-- Son Sorgular -->
+        <div class="recent">
+            <h2>
+                <i class="fas fa-history"></i>
+                Son Sorgular
+            </h2>
+            <div class="recent-grid" id="recentGrid">
+                <!-- JS ile doldurulacak -->
             </div>
         </div>
     </div>
     
-    <!-- Toast container -->
-    <div id="toast"></div>
-    
     <script>
-        // ==================== GLOBAL VARIABLES ====================
+        // API Base URL
+        const API_BASE = 'https://botapi-jjwj.onrender.com';
+        
+        // State
         let currentType = 'tc';
         let recentQueries = JSON.parse(localStorage.getItem('recentQueries')) || [];
-        let timeoutId = null;
         
-        // Query type configurations
-        const queryTypes = {
+        // Query types
+        const types = {
             'tc': {
                 name: 'TC Sorgulama',
                 icon: 'fa-id-card',
-                placeholder: '11 haneli TC kimlik numarası',
                 example: '12345678901',
-                badge: 'tc'
+                badge: 'tc',
+                url: (p) => `${API_BASE}/tc?tc=${p}&format=json`
             },
             'tc2': {
-                name: 'TC Detaylı Sorgulama',
+                name: 'TC Detaylı',
                 icon: 'fa-id-card',
-                placeholder: '11 haneli TC kimlik numarası',
                 example: '12345678901',
-                badge: 'tc2'
+                badge: 'tc2',
+                url: (p) => `${API_BASE}/tc2?tc=${p}&format=json`
             },
             'gsm': {
                 name: 'GSM Sorgulama',
                 icon: 'fa-mobile-alt',
-                placeholder: '10 haneli GSM numarası',
                 example: '5346149118',
-                badge: 'gsm'
+                badge: 'gsm',
+                url: (p) => `${API_BASE}/gsm?gsm=${p}&format=json`
             },
             'gsm2': {
-                name: 'GSM Detaylı Sorgulama',
+                name: 'GSM Detaylı',
                 icon: 'fa-mobile-alt',
-                placeholder: '10 haneli GSM numarası',
                 example: '5346149118',
-                badge: 'gsm2'
+                badge: 'gsm2',
+                url: (p) => `${API_BASE}/gsm2?gsm=${p}&format=json`
             },
             'ad': {
-                name: 'Ad-Soyad Sorgulama',
+                name: 'Ad-Soyad',
                 icon: 'fa-user',
-                placeholder: 'Ad ve soyad (örn: EYMEN YAVUZ)',
                 example: 'EYMEN YAVUZ',
-                badge: 'ad'
+                badge: 'ad',
+                url: (p) => {
+                    const parts = p.split(' ');
+                    return `${API_BASE}/ad?name=${parts[0]}&surname=${parts[1] || ''}&format=json`;
+                }
             },
             'aile': {
                 name: 'Aile Sorgulama',
                 icon: 'fa-users',
-                placeholder: 'TC kimlik numarası',
                 example: '12345678901',
-                badge: 'aile'
+                badge: 'aile',
+                url: (p) => `${API_BASE}/aile?tc=${p}&format=json`
             },
             'sulale': {
                 name: 'Sülale Sorgulama',
                 icon: 'fa-tree',
-                placeholder: 'TC kimlik numarası',
                 example: '12345678901',
-                badge: 'sulale'
+                badge: 'sulale',
+                url: (p) => `${API_BASE}/sulale?tc=${p}&format=json`
             },
             'hane': {
                 name: 'Hane Sorgulama',
                 icon: 'fa-home',
-                placeholder: 'TC kimlik numarası',
                 example: '12345678901',
-                badge: 'hane'
+                badge: 'hane',
+                url: (p) => `${API_BASE}/hane?tc=${p}&format=json`
             },
             'isyeri': {
                 name: 'İş Yeri Sorgulama',
                 icon: 'fa-briefcase',
-                placeholder: 'TC kimlik numarası',
                 example: '12345678901',
-                badge: 'isyeri'
+                badge: 'isyeri',
+                url: (p) => `${API_BASE}/isyeri?tc=${p}&format=json`
             },
             'plaka': {
                 name: 'Plaka Sorgulama',
                 icon: 'fa-car',
-                placeholder: 'Plaka (örn: 34AKP34)',
                 example: '34AKP34',
-                badge: 'plaka'
+                badge: 'plaka',
+                url: (p) => `${API_BASE}/plaka?plaka=${p}&format=json`
             },
             'vesika': {
                 name: 'Vesika Sorgulama',
                 icon: 'fa-id-card',
-                placeholder: 'TC kimlik numarası',
                 example: '12345678901',
-                badge: 'vesika'
+                badge: 'vesika',
+                url: (p) => `${API_BASE}/vesika?tc=${p}&format=json`
             },
             'tc-ikametgah': {
                 name: 'İkametgah Sorgulama',
                 icon: 'fa-map-marker-alt',
-                placeholder: 'TC kimlik numarası',
                 example: '12345678901',
-                badge: 'ikametgah'
+                badge: 'ikametgah',
+                url: (p) => `${API_BASE}/tc-ikametgah?tc=${p}&format=json`
             }
         };
         
-        // ==================== HAMBURGER MENU ====================
-        const hamburger = document.getElementById('hamburgerBtn');
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('overlay');
-        const mainContent = document.getElementById('mainContent');
-        
-        function toggleMenu() {
-            sidebar.classList.toggle('open');
-            hamburger.classList.toggle('active');
-            overlay.classList.toggle('show');
-            mainContent.classList.toggle('shifted');
-        }
-        
-        hamburger.addEventListener('click', toggleMenu);
-        overlay.addEventListener('click', toggleMenu);
-        
-        // ==================== MENU FILTER ====================
-        function filterMenu() {
-            const search = document.getElementById('menuSearch').value.toLowerCase();
-            const items = document.querySelectorAll('.menu-item');
-            
-            items.forEach(item => {
-                const text = item.textContent.toLowerCase();
-                if (text.includes(search)) {
-                    item.style.display = 'flex';
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-        }
-        
-        // ==================== SET QUERY TYPE ====================
-        function setQueryType(type) {
+        // Set query type
+        function setType(type) {
             currentType = type;
-            const config = queryTypes[type];
+            const t = types[type];
             
-            if (!config) return;
-            
-            // Update UI
-            document.getElementById('queryIcon').className = `fas ${config.icon}`;
-            document.getElementById('queryTitle').textContent = config.name;
-            document.getElementById('queryTypeBadge').innerHTML = `<i class="fas ${config.icon}"></i><span>${config.badge}</span>`;
-            document.getElementById('queryParam').placeholder = config.placeholder;
-            document.getElementById('queryExample').innerHTML = `<i class="fas fa-info-circle"></i> Örnek: ${config.example}`;
-            
-            // Update active menu item
-            document.querySelectorAll('.menu-item').forEach(item => {
-                item.classList.remove('active');
-            });
-            
-            // Find and highlight active menu item (simplified)
-            const activeItems = Array.from(document.querySelectorAll('.menu-item')).filter(
-                item => item.textContent.toLowerCase().includes(config.name.toLowerCase())
-            );
-            if (activeItems.length > 0) {
-                activeItems[0].classList.add('active');
-            }
-            
-            // Close menu on mobile
-            if (window.innerWidth <= 768) {
-                toggleMenu();
-            }
+            document.getElementById('typeIcon').className = `fas ${t.icon}`;
+            document.getElementById('typeTitle').textContent = t.name;
+            document.getElementById('typeBadge').textContent = t.badge;
+            document.getElementById('queryExample').innerHTML = `<i class="fas fa-info-circle"></i> Örnek: ${t.example}`;
         }
         
-        // ==================== EXECUTE QUERY ====================
+        // Execute query
         async function executeQuery() {
             const param = document.getElementById('queryParam').value.trim();
             
             if (!param) {
-                showToast('Lütfen parametre girin!', 'error');
+                alert('Parametre girin!');
                 return;
             }
             
-            // Clear previous timeout
-            if (timeoutId) clearTimeout(timeoutId);
+            const t = types[currentType];
+            const url = t.url(encodeURIComponent(param));
             
             // Show loader
             document.getElementById('queryLoader').style.display = 'block';
             document.getElementById('resultContainer').style.display = 'none';
             document.getElementById('queryBtn').disabled = true;
             
-            // Set timeout (40 seconds)
-            timeoutId = setTimeout(() => {
+            // Timeout 30 saniye
+            const timeout = setTimeout(() => {
                 document.getElementById('queryLoader').style.display = 'none';
                 document.getElementById('queryBtn').disabled = false;
-                showToast('Sorgu zaman aşımına uğradı! (40 saniye)', 'error');
-            }, 40000);
+                alert('Zaman aşımı! (30 saniye)');
+            }, 30000);
             
             try {
-                const response = await fetch('api-proxy.php?type=' + currentType + '&param=' + encodeURIComponent(param));
-                const data = await response.json();
+                // API'ye direkt istek
+                const response = await fetch(url);
+                clearTimeout(timeout);
                 
-                // Clear timeout
-                clearTimeout(timeoutId);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const data = await response.json();
                 
                 // Hide loader
                 document.getElementById('queryLoader').style.display = 'none';
                 document.getElementById('queryBtn').disabled = false;
                 
-                if (data.success) {
-                    // Show result
-                    const resultContent = document.getElementById('resultContent');
-                    const resultData = data.data || data;
-                    const resultStr = JSON.stringify(resultData, null, 2);
-                    
-                    resultContent.textContent = resultStr;
-                    
-                    // Check if result is small (less than 1000 chars) for special styling
-                    if (resultStr.length < 1000) {
-                        resultContent.classList.add('small-result');
-                    } else {
-                        resultContent.classList.remove('small-result');
-                    }
-                    
-                    document.getElementById('resultContainer').style.display = 'block';
-                    
-                    // Add to recent
-                    addToRecent(currentType, param, resultData);
-                    
-                    showToast('Sorgu başarılı!', 'success');
+                // Show result
+                const resultContent = document.getElementById('resultContent');
+                const resultStr = JSON.stringify(data, null, 2);
+                
+                resultContent.textContent = resultStr;
+                
+                // Küçük sonuçsa özel stil
+                if (resultStr.length < 1000) {
+                    resultContent.classList.add('small');
                 } else {
-                    showToast(data.error || 'Sorgu başarısız!', 'error');
+                    resultContent.classList.remove('small');
                 }
+                
+                document.getElementById('resultContainer').style.display = 'block';
+                
+                // Son sorgulara ekle
+                addToRecent(currentType, param, data);
+                
             } catch (error) {
-                clearTimeout(timeoutId);
+                clearTimeout(timeout);
                 document.getElementById('queryLoader').style.display = 'none';
                 document.getElementById('queryBtn').disabled = false;
-                showToast('Bağlantı hatası: ' + error.message, 'error');
+                alert('Hata: ' + error.message);
             }
         }
         
-        // ==================== COPY RESULT ====================
+        // Copy result
         function copyResult() {
             const content = document.getElementById('resultContent').textContent;
             navigator.clipboard.writeText(content).then(() => {
-                showToast('Sonuç kopyalandı!', 'success');
-            }).catch(() => {
-                showToast('Kopyalama başarısız!', 'error');
+                alert('Kopyalandı!');
             });
         }
         
-        // ==================== DOWNLOAD RESULT ====================
+        // Download result
         function downloadResult() {
             const content = document.getElementById('resultContent').textContent;
-            const type = queryTypes[currentType].name;
-            const param = document.getElementById('queryParam').value.trim();
-            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-            const filename = `${type}_${param}_${timestamp}.txt`.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-            
             const blob = new Blob([content], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = filename;
+            a.download = `sorgu_${currentType}_${Date.now()}.txt`;
             a.click();
             URL.revokeObjectURL(url);
-            
-            showToast('Dosya indiriliyor...', 'success');
         }
         
-        // ==================== RECENT QUERIES ====================
+        // Add to recent
         function addToRecent(type, param, data) {
-            const typeNames = {
-                'tc': 'TC Sorgu', 'tc2': 'TC Detaylı', 'gsm': 'GSM Sorgu',
-                'gsm2': 'GSM Detaylı', 'ad': 'Ad-Soyad', 'aile': 'Aile',
-                'sulale': 'Sülale', 'hane': 'Hane', 'isyeri': 'İş Yeri',
-                'plaka': 'Plaka', 'vesika': 'Vesika', 'tc-ikametgah': 'İkametgah'
-            };
-            
             const query = {
-                type: typeNames[type] || type,
+                type: types[type].name,
                 param: param,
                 time: new Date().toLocaleString('tr-TR'),
-                data: data,
-                timestamp: Date.now()
+                data: data
             };
             
             recentQueries.unshift(query);
             if (recentQueries.length > 10) recentQueries.pop();
             
             localStorage.setItem('recentQueries', JSON.stringify(recentQueries));
-            loadRecentQueries();
+            loadRecent();
         }
         
-        function loadRecentQueries() {
+        // Load recent
+        function loadRecent() {
             const grid = document.getElementById('recentGrid');
             
             if (recentQueries.length === 0) {
-                grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--gray-400); padding: 40px;">Henüz sorgu yapılmadı</p>';
+                grid.innerHTML = '<p style="text-align: center; color: #999;">Henüz sorgu yok</p>';
                 return;
             }
             
             grid.innerHTML = recentQueries.map(q => `
-                <div class="recent-item" onclick='showRecentResult(${JSON.stringify(q.data).replace(/'/g, "\\'")})'>
-                    <div class="recent-item-header">
-                        <span class="recent-type">${q.type}</span>
-                        <span class="recent-time">${q.time}</span>
-                    </div>
+                <div class="recent-item" onclick='showRecent(${JSON.stringify(q.data)})'>
+                    <span class="recent-type">${q.type}</span>
                     <div class="recent-param">${q.param}</div>
-                    <div class="recent-preview">${JSON.stringify(q.data).substring(0, 50)}...</div>
+                    <div class="recent-time">${q.time}</div>
                 </div>
             `).join('');
         }
         
-        function showRecentResult(data) {
+        // Show recent
+        function showRecent(data) {
             const resultContent = document.getElementById('resultContent');
-            const resultStr = JSON.stringify(data, null, 2);
-            
-            resultContent.textContent = resultStr;
-            
-            if (resultStr.length < 1000) {
-                resultContent.classList.add('small-result');
-            } else {
-                resultContent.classList.remove('small-result');
-            }
-            
+            resultContent.textContent = JSON.stringify(data, null, 2);
             document.getElementById('resultContainer').style.display = 'block';
         }
         
+        // Clear recent
         function clearRecent() {
-            if (confirm('Tüm son sorgular silinsin mi?')) {
+            if (confirm('Son sorgular silinsin mi?')) {
                 recentQueries = [];
                 localStorage.removeItem('recentQueries');
-                loadRecentQueries();
-                showToast('Son sorgular temizlendi', 'success');
+                loadRecent();
             }
         }
         
-        // ==================== TOAST ====================
-        function showToast(message, type = 'success') {
-            const toast = document.getElementById('toast');
-            toast.innerHTML = `
-                <div class="toast ${type}">
-                    <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
-                    <span>${message}</span>
-                </div>
-            `;
-            
-            setTimeout(() => {
-                toast.innerHTML = '';
-            }, 3000);
-        }
-        
-        // ==================== INIT ====================
+        // Load on start
         document.addEventListener('DOMContentLoaded', () => {
-            loadRecentQueries();
-            setQueryType('tc');
-            
-            // Close menu on escape
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && sidebar.classList.contains('open')) {
-                    toggleMenu();
-                }
-            });
+            setType('tc');
+            loadRecent();
         });
     </script>
     <?php endif; ?>
