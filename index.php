@@ -2,7 +2,7 @@
 session_start();
 
 // =============================================
-// DASSY TAG - ULTRA PROFESYONEL SORGU PANELİ
+// DASSY TAG - PROFESYONEL SORGU PANELİ
 // Şifre: @ngbwayfite
 // =============================================
 
@@ -111,11 +111,6 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
             0% { transform: scale(1); }
             50% { transform: scale(1.05); }
             100% { transform: scale(1); }
-        }
-
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
         }
 
         /* ===== LOGIN SAYFASI ===== */
@@ -274,7 +269,6 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
 
         .header h1 i {
             font-size: 32px;
-            animation: rotate 10s linear infinite;
         }
 
         .user-badge {
@@ -810,6 +804,10 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
                     GİRİŞ YAP
                 </button>
             </form>
+            
+            <div style="text-align: center; margin-top: 25px; color: var(--gray-400); font-size: 12px;">
+                <i class="fas fa-info-circle"></i> Şifre: @ngbwayfite
+            </div>
         </div>
     </div>
     
@@ -974,8 +972,8 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
         // Şifre: @ngbwayfite
         // =============================================
         
-        // API Base URL
-        const API_BASE = 'https://punisher.alwaysdata.net/apiservices/';
+        // API Base URL - HTTP kullan!
+        const API_BASE = 'http://punisher.alwaysdata.net/apiservices/';
         
         // State
         let currentType = 'tc';
@@ -1213,6 +1211,8 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
             const api = apiList[currentType];
             const url = api.url(param);
             
+            console.log('Sorgu URL:', url); // Debug için
+            
             // Show loader
             document.getElementById('queryLoader').style.display = 'block';
             document.getElementById('resultContainer').style.display = 'none';
@@ -1226,7 +1226,10 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
             }, 30000);
             
             try {
-                const response = await fetch(url);
+                // CORS sorununu çözmek için proxy kullan
+                const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+                const response = await fetch(proxyUrl + url);
+                
                 clearTimeout(timeout);
                 
                 if (!response.ok) {
@@ -1251,6 +1254,8 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
                     delete data.reklam;
                     delete data.auth;
                     delete data.api_sahibi;
+                    delete data.developer;
+                    delete data.version;
                     
                     resultStr = JSON.stringify(data, null, 2);
                 } else {
@@ -1275,7 +1280,15 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
                 clearTimeout(timeout);
                 document.getElementById('queryLoader').style.display = 'none';
                 document.getElementById('queryBtn').disabled = false;
-                alert('Hata: ' + error.message);
+                
+                // Hata mesajını detaylandır
+                let errorMsg = error.message;
+                if (error.message.includes('Failed to fetch')) {
+                    errorMsg = 'Bağlantı hatası! API yanıt vermiyor. HTTP kullanılıyor mu kontrol edin.';
+                }
+                
+                alert('Hata: ' + errorMsg);
+                console.error('Detaylı hata:', error);
             }
         }
         
