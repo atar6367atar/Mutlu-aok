@@ -1,22 +1,14 @@
 <?php
 session_start();
 
-// =============================================
-// DASSY TAG - JOKER TEMALI ULTRA PROFESYONEL PANEL
-// Şifre: @ngbwayfite
-// CORS sorunu çözüldü!
-// =============================================
-
 define('SIFRE', '@ngbwayfite');
 
-// Logout
 if (isset($_GET['logout'])) {
     session_destroy();
     header('Location: index.php');
     exit;
 }
 
-// Login
 if (isset($_POST['login'])) {
     if ($_POST['password'] === SIFRE) {
         $_SESSION['loggedin'] = true;
@@ -33,10 +25,9 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DASSY TAG | JOKER PANEL</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* ===== JOKER TEMASI ===== */
         * {
             margin: 0;
             padding: 0;
@@ -44,104 +35,57 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
         }
 
         :root {
-            --joker-purple: #6d28d9;
-            --joker-dark: #1e0b36;
-            --joker-darker: #0f051d;
-            --joker-light: #a78bfa;
-            --joker-glow: #c4b5fd;
+            --joker-purple: #8b5cf6;
+            --joker-dark: #2e1065;
+            --joker-darker: #1e0b36;
+            --joker-light: #c4b5fd;
+            --joker-glow: #a78bfa;
             --joker-green: #10b981;
-            --joker-red: #ef4444;
-            --joker-yellow: #f59e0b;
-            --joker-pink: #ec4899;
         }
 
         body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, var(--joker-darker) 0%, var(--joker-dark) 50%, var(--joker-purple) 100%);
+            font-family: 'Orbitron', sans-serif;
+            background: linear-gradient(135deg, #000, var(--joker-darker), var(--joker-dark));
             min-height: 100vh;
-            position: relative;
             overflow-x: hidden;
+            position: relative;
         }
 
-        /* Joker kartları arka plan */
-        body::before {
-            content: '';
+        /* Floating Cards */
+        .floating-card {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.1"><path d="M20 20 L80 20 L80 80 L20 80 Z" stroke="%23a855f7" stroke-width="2" fill="none"/><circle cx="50" cy="50" r="20" stroke="%23a855f7" stroke-width="2" fill="none"/><text x="45" y="55" fill="%23a855f7" font-size="20">♠</text></svg>') repeat;
+            font-size: 40px;
+            color: var(--joker-purple);
+            opacity: 0.2;
             pointer-events: none;
-            z-index: 0;
-            animation: floatBg 20s linear infinite;
+            z-index: 1;
+            animation: float 10s ease-in-out infinite;
         }
 
-        @keyframes floatBg {
-            0% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(5deg); }
-            100% { transform: translateY(0) rotate(0deg); }
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-30px) rotate(10deg); }
         }
 
-        /* ===== JOKER ANİMASYONLARI ===== */
-        @keyframes jokerFloat {
-            0% { transform: translateY(0px) scale(1); }
-            50% { transform: translateY(-20px) scale(1.05); }
-            100% { transform: translateY(0px) scale(1); }
-        }
+        .card1 { top: 10%; left: 5%; animation-delay: 0s; }
+        .card2 { top: 20%; right: 8%; animation-delay: 2s; }
+        .card3 { bottom: 15%; left: 10%; animation-delay: 4s; }
+        .card4 { bottom: 25%; right: 15%; animation-delay: 6s; }
+        .card5 { top: 50%; left: 50%; animation-delay: 8s; }
 
-        @keyframes jokerSpin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        @keyframes jokerPulse {
-            0% { box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.7); }
-            70% { box-shadow: 0 0 0 20px rgba(168, 85, 247, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(168, 85, 247, 0); }
-        }
-
-        @keyframes jokerGlow {
+        @keyframes glow {
             0% { filter: drop-shadow(0 0 5px var(--joker-purple)); }
-            50% { filter: drop-shadow(0 0 20px var(--joker-light)); }
+            50% { filter: drop-shadow(0 0 30px var(--joker-light)); }
             100% { filter: drop-shadow(0 0 5px var(--joker-purple)); }
         }
 
-        @keyframes jokerSlideIn {
-            0% {
-                opacity: 0;
-                transform: translateX(-100px) rotate(-10deg);
-            }
-            100% {
-                opacity: 1;
-                transform: translateX(0) rotate(0deg);
-            }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
         }
 
-        @keyframes jokerFadeInUp {
-            0% {
-                opacity: 0;
-                transform: translateY(50px) scale(0.9);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-
-        @keyframes jokerCardFlip {
-            0% { transform: rotateY(0deg); }
-            50% { transform: rotateY(180deg); }
-            100% { transform: rotateY(360deg); }
-        }
-
-        @keyframes jokerShake {
-            0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px) rotate(-2deg); }
-            20%, 40%, 60%, 80% { transform: translateX(5px) rotate(2deg); }
-        }
-
-        /* ===== LOGIN SAYFASI ===== */
+        /* Login */
         .login-wrapper {
             min-height: 100vh;
             display: flex;
@@ -153,96 +97,53 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
         }
 
         .login-card {
-            background: rgba(30, 11, 54, 0.9);
-            backdrop-filter: blur(15px);
+            background: rgba(46, 16, 101, 0.9);
+            backdrop-filter: blur(10px);
             border-radius: 40px;
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), 0 0 0 2px var(--joker-purple), 0 0 30px var(--joker-glow);
             padding: 50px;
             width: 100%;
             max-width: 450px;
-            animation: jokerFloat 6s ease-in-out infinite, jokerGlow 3s ease-in-out infinite;
-            border: 1px solid rgba(168, 85, 247, 0.3);
-            transform-style: preserve-3d;
-            perspective: 1000px;
-        }
-
-        .login-card:hover {
-            animation: jokerShake 0.5s ease-in-out;
+            border: 2px solid var(--joker-purple);
+            box-shadow: 0 0 50px var(--joker-glow);
+            animation: glow 3s ease-in-out infinite;
         }
 
         .login-logo {
             text-align: center;
             margin-bottom: 40px;
-            animation: jokerSlideIn 0.8s ease;
         }
 
         .login-logo i {
             font-size: 80px;
             color: var(--joker-light);
-            text-shadow: 0 0 30px var(--joker-purple);
-            animation: jokerSpin 10s linear infinite, jokerGlow 2s ease-in-out infinite;
+            animation: pulse 2s ease-in-out infinite;
         }
 
         .login-logo h1 {
             font-size: 48px;
-            font-weight: 900;
-            font-family: 'Orbitron', sans-serif;
-            background: linear-gradient(135deg, #fff, var(--joker-light), var(--joker-purple));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin: 15px 0 5px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            animation: jokerGlow 3s ease-in-out infinite;
-        }
-
-        .login-logo p {
-            color: var(--joker-light);
-            font-size: 14px;
-            letter-spacing: 3px;
-            text-transform: uppercase;
+            color: white;
+            text-shadow: 0 0 20px var(--joker-purple);
+            margin: 15px 0;
         }
 
         .login-input-group {
             margin-bottom: 25px;
-            position: relative;
-            animation: jokerFadeInUp 0.7s ease;
-        }
-
-        .login-input-group i {
-            position: absolute;
-            left: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--joker-light);
-            font-size: 18px;
-            z-index: 1;
-            animation: jokerGlow 2s ease-in-out infinite;
         }
 
         .login-input-group input {
             width: 100%;
-            padding: 18px 20px 18px 50px;
+            padding: 18px 25px;
+            background: rgba(255,255,255,0.1);
             border: 2px solid var(--joker-purple);
             border-radius: 20px;
-            font-size: 16px;
-            font-weight: 500;
-            transition: all 0.3s;
-            background: rgba(255, 255, 255, 0.1);
             color: white;
-            backdrop-filter: blur(5px);
-        }
-
-        .login-input-group input::placeholder {
-            color: rgba(255, 255, 255, 0.5);
+            font-size: 16px;
         }
 
         .login-input-group input:focus {
-            border-color: var(--joker-light);
             outline: none;
+            border-color: var(--joker-light);
             box-shadow: 0 0 30px var(--joker-glow);
-            transform: scale(1.02) translateY(-2px);
-            background: rgba(255, 255, 255, 0.15);
         }
 
         .login-btn {
@@ -255,65 +156,490 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
             font-size: 18px;
             font-weight: 800;
             cursor: pointer;
-            transition: all 0.3s;
-            position: relative;
-            overflow: hidden;
             text-transform: uppercase;
             letter-spacing: 2px;
-            animation: jokerPulse 2s ease-in-out infinite;
-        }
-
-        .login-btn::before {
-            content: '♠♣♥♦';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            transition: left 0.5s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-        }
-
-        .login-btn:hover::before {
-            left: 100%;
+            animation: pulse 2s ease-in-out infinite;
         }
 
         .login-btn:hover {
-            transform: translateY(-5px) scale(1.05);
-            box-shadow: 0 20px 40px rgba(168, 85, 247, 0.5);
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(139, 92, 246, 0.5);
         }
 
-        .login-error {
-            background: rgba(239, 68, 68, 0.2);
-            backdrop-filter: blur(5px);
-            color: white;
-            padding: 15px 20px;
-            border-radius: 20px;
-            margin-bottom: 25px;
-            font-size: 14px;
-            font-weight: 600;
-            border: 1px solid var(--joker-red);
-            animation: jokerShake 0.5s;
-        }
-
-        /* ===== DASHBOARD ===== */
+        /* Dashboard */
         .dashboard {
-            min-height: 100vh;
             padding: 30px;
             position: relative;
             z-index: 10;
-            animation: jokerFadeInUp 0.8s ease;
         }
 
-        .joker-header {
-            background: rgba(30, 11, 54, 0.8);
-            backdrop-filter: blur(15px);
+        .header {
+            background: rgba(46, 16, 101, 0.9);
+            backdrop-filter: blur(10px);
             border-radius: 30px;
             padding: 25px 35px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 2px solid var(--joker-purple);
+            box-shadow: 0 0 30px var(--joker-glow);
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 32px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header h1 i {
+            color: var(--joker-light);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .badge {
+            background: linear-gradient(135deg, var(--joker-purple), var(--joker-light));
+            padding: 10px 25px;
+            border-radius: 40px;
+            color: white;
+            font-weight: 700;
+        }
+
+        .logout-btn {
+            background: rgba(239, 68, 68, 0.3);
+            color: white;
+            border: 1px solid #ef4444;
+            padding: 10px 25px;
+            border-radius: 40px;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: #ef4444;
+            transform: translateY(-3px);
+        }
+
+        /* Cards */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: rgba(46, 16, 101, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 25px;
+            padding: 25px;
+            border: 2px solid var(--joker-purple);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            border-color: var(--joker-light);
+            box-shadow: 0 20px 40px rgba(139, 92, 246, 0.3);
+        }
+
+        .card-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--joker-purple), var(--joker-light));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        .card-icon i {
+            font-size: 30px;
+            color: white;
+        }
+
+        .card h3 {
+            color: white;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        /* Query */
+        .query-box {
+            background: rgba(46, 16, 101, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 2px solid var(--joker-purple);
+        }
+
+        .query-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--joker-purple);
+        }
+
+        .query-header i {
+            font-size: 40px;
+            color: var(--joker-light);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .query-header h2 {
+            color: white;
+            font-size: 24px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .input-group input {
+            flex: 1;
+            padding: 18px 25px;
+            background: rgba(255,255,255,0.1);
+            border: 2px solid var(--joker-purple);
+            border-radius: 20px;
+            color: white;
+            font-size: 16px;
+        }
+
+        .input-group button {
+            padding: 18px 35px;
+            background: linear-gradient(135deg, var(--joker-purple), var(--joker-light));
+            border: none;
+            border-radius: 20px;
+            color: white;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .input-group button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(139, 92, 246, 0.5);
+        }
+
+        .input-group button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .example {
+            color: var(--joker-light);
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Loader */
+        .loader {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--joker-purple);
+            border-top-color: var(--joker-light);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Result */
+        .result {
+            background: rgba(0,0,0,0.3);
+            border-radius: 20px;
+            padding: 25px;
+            margin-top: 25px;
+            border: 2px solid var(--joker-purple);
+            display: none;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .result-header h3 {
+            color: var(--joker-green);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .result-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .result-actions button {
+            padding: 8px 15px;
+            background: rgba(255,255,255,0.1);
+            border: 2px solid var(--joker-purple);
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .result-actions button:hover {
+            background: var(--joker-purple);
+        }
+
+        .result-content {
+            background: rgba(0,0,0,0.5);
+            border-radius: 15px;
+            padding: 20px;
+            font-family: monospace;
+            font-size: 14px;
+            color: var(--joker-light);
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+
+        .result-content.small {
+            background: rgba(16, 185, 129, 0.1);
+            border-left: 5px solid var(--joker-green);
+        }
+
+        /* Recent */
+        .recent {
+            background: rgba(46, 16, 101, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 30px;
+            border: 2px solid var(--joker-purple);
+        }
+
+        .recent-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .recent-header h2 {
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .clear-btn {
+            padding: 10px 20px;
+            background: rgba(239, 68, 68, 0.3);
+            border: 1px solid #ef4444;
+            border-radius: 15px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .clear-btn:hover {
+            background: #ef4444;
+        }
+
+        .recent-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .recent-item {
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .recent-item:hover {
+            background: rgba(139, 92, 246, 0.3);
+            transform: translateX(10px);
+        }
+
+        .recent-type {
+            background: linear-gradient(135deg, var(--joker-purple), var(--joker-light));
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+
+        .recent-param {
+            color: white;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .recent-time {
+            color: rgba(255,255,255,0.5);
+            font-size: 11px;
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-card card1">♠</div>
+    <div class="floating-card card2">♣</div>
+    <div class="floating-card card3">♥</div>
+    <div class="floating-card card4">♦</div>
+    <div class="floating-card card5">🃏</div>
+
+    <?php if (!$giris_yapildi): ?>
+    <!-- LOGIN -->
+    <div class="login-wrapper">
+        <div class="login-card">
+            <div class="login-logo">
+                <i class="fas fa-crown"></i>
+                <h1>JOKER</h1>
+                <p style="color: var(--joker-light);">PROFESYONEL PANEL</p>
+            </div>
+            
+            <?php if (isset($hata)): ?>
+                <div style="background: rgba(239,68,68,0.3); color: white; padding: 15px; border-radius: 15px; margin-bottom: 25px;">
+                    <?= $hata ?>
+                </div>
+            <?php endif; ?>
+            
+            <form method="POST">
+                <div class="login-input-group">
+                    <input type="password" name="password" placeholder="ŞİFRE" required>
+                </div>
+                <button type="submit" name="login" class="login-btn">GİRİŞ</button>
+            </form>
+            
+            <div style="text-align: center; margin-top: 25px; color: var(--joker-light);">
+                Şifre: @ngbwayfite
+            </div>
+        </div>
+    </div>
+    
+    <?php else: ?>
+    <!-- DASHBOARD -->
+    <div class="dashboard">
+        <div class="header">
+            <h1>
+                <i class="fas fa-crown"></i>
+                JOKER PANEL
+            </h1>
+            <div style="display: flex; gap: 20px;">
+                <div class="badge">PRO</div>
+                <a href="?logout=1" class="logout-btn">ÇIKIŞ</a>
+            </div>
+        </div>
+        
+        <!-- Kategoriler -->
+        <div class="grid">
+            <div class="card" onclick="setCategory('tc')">
+                <div class="card-icon"><i class="fas fa-id-card"></i></div>
+                <h3>TC</h3>
+            </div>
+            <div class="card" onclick="setCategory('gsm')">
+                <div class="card-icon"><i class="fas fa-mobile-alt"></i></div>
+                <h3>GSM</h3>
+            </div>
+            <div class="card" onclick="setCategory('isim')">
+                <div class="card-icon"><i class="fas fa-user"></i></div>
+                <h3>İSİM</h3>
+            </div>
+            <div class="card" onclick="setCategory('aile')">
+                <div class="card-icon"><i class="fas fa-users"></i></div>
+                <h3>AİLE</h3>
+            </div>
+            <div class="card" onclick="setCategory('adres')">
+                <div class="card-icon"><i class="fas fa-map-marker-alt"></i></div>
+                <h3>ADRES</h3>
+            </div>
+            <div class="card" onclick="setCategory('finans')">
+                <div class="card-icon"><i class="fas fa-coins"></i></div>
+                <h3>FİNANS</h3>
+            </div>
+        </div>
+        
+        <!-- Sorgu -->
+        <div class="query-box">
+            <div class="query-header">
+                <i class="fas fa-id-card" id="queryIcon"></i>
+                <h2 id="queryTitle">TC Sorgulama</h2>
+                <div class="badge" id="queryBadge">tc</div>
+            </div>
+            
+            <div class="input-group">
+                <input type="text" id="queryParam" placeholder="Parametre..." onkeypress="if(event.key==='Enter') executeQuery()">
+                <button onclick="executeQuery()" id="queryBtn">
+                    <i class="fas fa-search"></i> SORGULA
+                </button>
+            </div>
+            
+            <div class="example" id="queryExample">
+                <i class="fas fa-info-circle"></i> Örnek: 12345678901
+            </div>
+            
+            <!-- Loader -->
+            <div class="loader" id="queryLoader">
+                <div class="spinner"></div>
+                <p style="color: white;">Sorgulanıyor...</p>
+            </div>
+            
+            <!-- Sonuç -->
+            <div class="result" id="resultContainer">
+                <div class="result-header">
+                    <h3><i class="fas fa-check-circle"></i> SONUÇ</h3>
+                    <div class="result-actions">
+                        <button onclick="copyResult()"><i class="fas fa-copy"></i></button>
+                        <button onclick="downloadResult()"><i class="fas fa-download"></i></button>
+                    </div>
+                </div>
+                <div class="result-content" id="resultContent"></div>
+            </div>
+        </div>
+        
+        <!-- Son Sorgular -->
+        <div class="recent">
+            <div class="recent-header">
+                <h2><i class="fas fa-history"></i> SON SORGULAR</h2>
+                <button class="clear-btn" onclick="clearRecent()">TEMİZLE</button>
+            </div>
+            <div class="recent-grid" id="recentGrid"></div>
+        </div>
+    </div>
+    
+    <script>
+        // API'ler
+        const apiList = {
+            'tc': { name: 'TC Sorgulama', icon: 'fa-id-card', example: '12345678901', badge: 'tc', category: 'tc', proxyType: 'tc' },
+            'tcpro': { name: 'TC Profesyonel', icon: 'fa-id-card', example: '12345678901', badge: 'tcpro', category: 'tc', proxyType: 'tcpro' },
+            'adsoyad': { name: 'İsim-Soyisim', icon: 'fa-user', example: 'roket atar', badge: 'adsoyad', category: 'isim', proxyType: 'adsoyad' },
+            'adsoyadpro': { name: 'İsim-Soyisim-İl', icon: 'fa-user', example: 'roket atar bursa', badge: 'adsoyadpro', category: 'isim', proxyType: 'adsoyadpro' },
+            'adililce': { name: 'İsim-İl', icon: 'fa-user', example: 'roket bursa', badge: 'adililce', category: 'isim', proxyType: 'adililce' },
+            'aile': { name: 'Aile', icon: 'fa-users', example: '12345678901', badge: 'aile', category: 'aile', proxyType: 'aile' },
+            'ailepro': { name: 'Aile Pro', icon: 'fa-users', example: '12345678901', badge: 'ailepro', category: 'aile', proxyType: 'ailepro' },
+            'sulale': { name: 'Sülale', icon: 'fa-tree', example: '12345678901', badge: 'sulale', category: 'aile', proxyType: 'sulale' },
+            'soyagaci': { name: 'Soy Ağacı', icon: 'fa-tree', example: '12345678901', badge: 'soyagaci', category: 'aile', proxyType: 'soyagaci' },
+            'adres': { name: 'Adres', icon: 'fa-map-marker-alt', example: '12345678901', badge: 'adres', category: 'adres', proxyType: 'adres' },
+            'adrespro': { name: 'Adres Pro', icon: 'fa-map-ma 25px 35px;
             margin-bottom: 30px;
             display: flex;
             justify-content: space-between;
