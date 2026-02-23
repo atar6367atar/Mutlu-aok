@@ -2,8 +2,9 @@
 session_start();
 
 // =============================================
-// DASSY TAG - PROFESYONEL SORGU PANELİ
+// DASSY TAG - JOKER TEMALI ULTRA PROFESYONEL PANEL
 // Şifre: @ngbwayfite
+// CORS sorunu çözüldü!
 // =============================================
 
 define('SIFRE', '@ngbwayfite');
@@ -31,86 +32,113 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DASSY TAG | Profesyonel Sorgu Sistemi</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>DASSY TAG | JOKER PANEL</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* ===== RESET & VARIABLES ===== */
+        /* ===== JOKER TEMASI ===== */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Plus Jakarta Sans', sans-serif;
         }
 
         :root {
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --primary-light: #818cf8;
-            --secondary: #8b5cf6;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --dark: #0f172a;
-            --light: #f8fafc;
-            --gray-50: #f9fafb;
-            --gray-100: #f3f4f6;
-            --gray-200: #e5e7eb;
-            --gray-300: #d1d5db;
-            --gray-400: #9ca3af;
-            --gray-500: #6b7280;
-            --gray-600: #4b5563;
-            --gray-700: #374151;
-            --gray-800: #1f2937;
-            --gray-900: #111827;
+            --joker-purple: #6d28d9;
+            --joker-dark: #1e0b36;
+            --joker-darker: #0f051d;
+            --joker-light: #a78bfa;
+            --joker-glow: #c4b5fd;
+            --joker-green: #10b981;
+            --joker-red: #ef4444;
+            --joker-yellow: #f59e0b;
+            --joker-pink: #ec4899;
         }
 
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--joker-darker) 0%, var(--joker-dark) 50%, var(--joker-purple) 100%);
             min-height: 100vh;
             position: relative;
             overflow-x: hidden;
         }
 
-        /* ===== ANİMASYONLAR ===== */
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
-            100% { transform: translateY(0px); }
+        /* Joker kartları arka plan */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.1"><path d="M20 20 L80 20 L80 80 L20 80 Z" stroke="%23a855f7" stroke-width="2" fill="none"/><circle cx="50" cy="50" r="20" stroke="%23a855f7" stroke-width="2" fill="none"/><text x="45" y="55" fill="%23a855f7" font-size="20">♠</text></svg>') repeat;
+            pointer-events: none;
+            z-index: 0;
+            animation: floatBg 20s linear infinite;
         }
 
-        @keyframes glow {
-            0% { box-shadow: 0 0 5px rgba(99, 102, 241, 0.2); }
-            50% { box-shadow: 0 0 30px rgba(99, 102, 241, 0.6); }
-            100% { box-shadow: 0 0 5px rgba(99, 102, 241, 0.2); }
+        @keyframes floatBg {
+            0% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+            100% { transform: translateY(0) rotate(0deg); }
         }
 
-        @keyframes slideIn {
-            from {
+        /* ===== JOKER ANİMASYONLARI ===== */
+        @keyframes jokerFloat {
+            0% { transform: translateY(0px) scale(1); }
+            50% { transform: translateY(-20px) scale(1.05); }
+            100% { transform: translateY(0px) scale(1); }
+        }
+
+        @keyframes jokerSpin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes jokerPulse {
+            0% { box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.7); }
+            70% { box-shadow: 0 0 0 20px rgba(168, 85, 247, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(168, 85, 247, 0); }
+        }
+
+        @keyframes jokerGlow {
+            0% { filter: drop-shadow(0 0 5px var(--joker-purple)); }
+            50% { filter: drop-shadow(0 0 20px var(--joker-light)); }
+            100% { filter: drop-shadow(0 0 5px var(--joker-purple)); }
+        }
+
+        @keyframes jokerSlideIn {
+            0% {
                 opacity: 0;
-                transform: translateX(-30px);
+                transform: translateX(-100px) rotate(-10deg);
             }
-            to {
+            100% {
                 opacity: 1;
-                transform: translateX(0);
+                transform: translateX(0) rotate(0deg);
             }
         }
 
-        @keyframes fadeInUp {
-            from {
+        @keyframes jokerFadeInUp {
+            0% {
                 opacity: 0;
-                transform: translateY(30px);
+                transform: translateY(50px) scale(0.9);
             }
-            to {
+            100% {
                 opacity: 1;
-                transform: translateY(0);
+                transform: translateY(0) scale(1);
             }
         }
 
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+        @keyframes jokerCardFlip {
+            0% { transform: rotateY(0deg); }
+            50% { transform: rotateY(180deg); }
+            100% { transform: rotateY(360deg); }
+        }
+
+        @keyframes jokerShake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px) rotate(-2deg); }
+            20%, 40%, 60%, 80% { transform: translateX(5px) rotate(2deg); }
         }
 
         /* ===== LOGIN SAYFASI ===== */
@@ -120,86 +148,123 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
             align-items: center;
             justify-content: center;
             padding: 20px;
-            animation: fadeInUp 0.8s ease;
+            position: relative;
+            z-index: 10;
         }
 
         .login-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
+            background: rgba(30, 11, 54, 0.9);
+            backdrop-filter: blur(15px);
             border-radius: 40px;
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), 0 0 0 2px var(--joker-purple), 0 0 30px var(--joker-glow);
             padding: 50px;
             width: 100%;
             max-width: 450px;
-            animation: float 6s ease-in-out infinite;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: jokerFloat 6s ease-in-out infinite, jokerGlow 3s ease-in-out infinite;
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+
+        .login-card:hover {
+            animation: jokerShake 0.5s ease-in-out;
         }
 
         .login-logo {
             text-align: center;
             margin-bottom: 40px;
-            animation: slideIn 0.6s ease;
+            animation: jokerSlideIn 0.8s ease;
         }
 
         .login-logo i {
-            font-size: 70px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: pulse 2s ease-in-out infinite;
+            font-size: 80px;
+            color: var(--joker-light);
+            text-shadow: 0 0 30px var(--joker-purple);
+            animation: jokerSpin 10s linear infinite, jokerGlow 2s ease-in-out infinite;
         }
 
         .login-logo h1 {
-            font-size: 36px;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            font-size: 48px;
+            font-weight: 900;
+            font-family: 'Orbitron', sans-serif;
+            background: linear-gradient(135deg, #fff, var(--joker-light), var(--joker-purple));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin: 15px 0 5px;
-            letter-spacing: -1px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            animation: jokerGlow 3s ease-in-out infinite;
+        }
+
+        .login-logo p {
+            color: var(--joker-light);
+            font-size: 14px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
         }
 
         .login-input-group {
             margin-bottom: 25px;
-            animation: slideIn 0.7s ease;
+            position: relative;
+            animation: jokerFadeInUp 0.7s ease;
+        }
+
+        .login-input-group i {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--joker-light);
+            font-size: 18px;
+            z-index: 1;
+            animation: jokerGlow 2s ease-in-out infinite;
         }
 
         .login-input-group input {
             width: 100%;
-            padding: 18px 25px;
-            border: 2px solid var(--gray-200);
+            padding: 18px 20px 18px 50px;
+            border: 2px solid var(--joker-purple);
             border-radius: 20px;
             font-size: 16px;
             font-weight: 500;
             transition: all 0.3s;
-            background: white;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            backdrop-filter: blur(5px);
+        }
+
+        .login-input-group input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
         }
 
         .login-input-group input:focus {
-            border-color: var(--primary);
+            border-color: var(--joker-light);
             outline: none;
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
-            transform: scale(1.02);
+            box-shadow: 0 0 30px var(--joker-glow);
+            transform: scale(1.02) translateY(-2px);
+            background: rgba(255, 255, 255, 0.15);
         }
 
         .login-btn {
             width: 100%;
             padding: 18px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background: linear-gradient(135deg, var(--joker-purple), var(--joker-light));
             border: none;
             border-radius: 20px;
             color: white;
-            font-size: 16px;
-            font-weight: 700;
+            font-size: 18px;
+            font-weight: 800;
             cursor: pointer;
             transition: all 0.3s;
             position: relative;
             overflow: hidden;
-            animation: pulse 2s ease-in-out infinite;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            animation: jokerPulse 2s ease-in-out infinite;
         }
 
         .login-btn::before {
-            content: '';
+            content: '♠♣♥♦';
             position: absolute;
             top: 0;
             left: -100%;
@@ -207,6 +272,10 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
             height: 100%;
             background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
             transition: left 0.5s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
         }
 
         .login-btn:hover::before {
@@ -214,89 +283,87 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
         }
 
         .login-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 30px rgba(99, 102, 241, 0.4);
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 20px 40px rgba(168, 85, 247, 0.5);
         }
 
         .login-error {
-            background: linear-gradient(135deg, #fee2e2, #fecaca);
-            color: var(--danger);
+            background: rgba(239, 68, 68, 0.2);
+            backdrop-filter: blur(5px);
+            color: white;
             padding: 15px 20px;
             border-radius: 20px;
             margin-bottom: 25px;
             font-size: 14px;
             font-weight: 600;
-            animation: shake 0.5s;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-            20%, 40%, 60%, 80% { transform: translateX(5px); }
+            border: 1px solid var(--joker-red);
+            animation: jokerShake 0.5s;
         }
 
         /* ===== DASHBOARD ===== */
         .dashboard {
             min-height: 100vh;
-            background: var(--gray-50);
             padding: 30px;
-            animation: fadeInUp 0.8s ease;
+            position: relative;
+            z-index: 10;
+            animation: jokerFadeInUp 0.8s ease;
         }
 
-        .header {
-            background: white;
+        .joker-header {
+            background: rgba(30, 11, 54, 0.8);
+            backdrop-filter: blur(15px);
             border-radius: 30px;
             padding: 25px 35px;
             margin-bottom: 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-            animation: slideIn 0.6s ease;
-            border: 1px solid rgba(255, 255, 255, 0.5);
+            border: 1px solid var(--joker-purple);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), 0 0 30px var(--joker-glow);
+            animation: jokerFloat 6s ease-in-out infinite;
         }
 
-        .header h1 {
-            font-size: 28px;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+        .joker-header h1 {
+            font-size: 32px;
+            font-weight: 900;
+            font-family: 'Orbitron', sans-serif;
+            background: linear-gradient(135deg, #fff, var(--joker-light));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .header h1 i {
-            font-size: 32px;
-        }
-
-        .user-badge {
             display: flex;
             align-items: center;
             gap: 15px;
         }
 
-        .status {
-            background: linear-gradient(135deg, #d1fae5, #a7f3d0);
-            padding: 10px 20px;
+        .joker-header h1 i {
+            font-size: 40px;
+            color: var(--joker-light);
+            animation: jokerSpin 10s linear infinite;
+        }
+
+        .joker-badge {
+            background: linear-gradient(135deg, var(--joker-purple), var(--joker-light));
+            padding: 10px 25px;
             border-radius: 40px;
-            color: #065f46;
+            color: white;
             font-weight: 700;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
+            box-shadow: 0 0 20px var(--joker-glow);
+            animation: jokerGlow 2s ease-in-out infinite;
         }
 
-        .status i {
-            color: #10b981;
-            animation: pulse 2s ease-in-out infinite;
+        .joker-badge i {
+            font-size: 18px;
+            animation: jokerPulse 1.5s ease-in-out infinite;
         }
 
         .logout-btn {
-            background: #fee2e2;
-            color: var(--danger);
-            border: none;
+            background: rgba(239, 68, 68, 0.2);
+            backdrop-filter: blur(5px);
+            color: white;
+            border: 1px solid var(--joker-red);
             padding: 10px 25px;
             border-radius: 40px;
             font-weight: 700;
@@ -305,137 +372,107 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
             text-decoration: none;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
 
         .logout-btn:hover {
-            background: #fecaca;
-            transform: translateY(-2px);
+            background: var(--joker-red);
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 10px 20px rgba(239, 68, 68, 0.3);
         }
 
-        /* Stats Grid */
-        .stats-grid {
+        /* Joker Kartları */
+        .joker-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 25px;
             margin-bottom: 30px;
         }
 
-        .stat-card {
-            background: white;
+        .joker-card {
+            background: rgba(30, 11, 54, 0.7);
+            backdrop-filter: blur(10px);
             border-radius: 25px;
             padding: 25px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--joker-purple);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             transition: all 0.3s;
-            animation: slideIn 0.7s ease;
-            border: 1px solid rgba(255, 255, 255, 0.5);
+            animation: jokerFadeInUp 0.5s ease;
             position: relative;
             overflow: hidden;
+            cursor: pointer;
         }
 
-        .stat-card::before {
-            content: '';
+        .joker-card::before {
+            content: '♠♣♥♦';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            top: -20px;
+            right: -20px;
+            font-size: 80px;
+            opacity: 0.1;
+            color: var(--joker-light);
+            transform: rotate(15deg);
+            animation: jokerSpin 20s linear infinite;
         }
 
-        .stat-card:hover {
-            transform: translateY(-5px) scale(1.02);
-            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.15);
+        .joker-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: var(--joker-light);
+            box-shadow: 0 20px 40px rgba(168, 85, 247, 0.3), 0 0 30px var(--joker-glow);
         }
 
-        .stat-icon {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+        .joker-card-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--joker-purple), var(--joker-light));
             border-radius: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
+            margin-bottom: 20px;
+            animation: jokerPulse 2s ease-in-out infinite;
+        }
+
+        .joker-card-icon i {
+            font-size: 35px;
+            color: white;
+            animation: jokerSpin 10s linear infinite;
+        }
+
+        .joker-card h3 {
+            color: white;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .joker-card p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
             margin-bottom: 15px;
         }
 
-        .stat-icon i {
-            font-size: 28px;
-            color: var(--primary);
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        .stat-value {
-            font-size: 32px;
-            font-weight: 800;
-            color: var(--gray-800);
-            margin-bottom: 5px;
-        }
-
-        .stat-label {
-            color: var(--gray-500);
+        .joker-badge-sm {
+            background: linear-gradient(135deg, var(--joker-purple), var(--joker-light));
+            padding: 5px 15px;
+            border-radius: 30px;
+            color: white;
+            font-size: 12px;
             font-weight: 600;
-            font-size: 14px;
-        }
-
-        /* Category Grid */
-        .category-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-
-        .category-btn {
-            background: white;
-            border: 2px solid var(--gray-200);
-            border-radius: 20px;
-            padding: 20px;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
-            font-weight: 700;
-            color: var(--gray-700);
-            animation: fadeInUp 0.5s ease;
-        }
-
-        .category-btn i {
-            font-size: 28px;
-            color: var(--primary);
-            transition: all 0.3s;
-        }
-
-        .category-btn:hover {
-            border-color: var(--primary);
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.2);
-        }
-
-        .category-btn:hover i {
-            transform: scale(1.1) rotate(5deg);
-        }
-
-        .category-btn.active {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border-color: transparent;
-            color: white;
-        }
-
-        .category-btn.active i {
-            color: white;
+            display: inline-block;
         }
 
         /* Query Section */
-        .query-section {
-            background: white;
+        .joker-query {
+            background: rgba(30, 11, 54, 0.8);
+            backdrop-filter: blur(15px);
             border-radius: 30px;
             padding: 30px;
             margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-            animation: slideIn 0.8s ease;
+            border: 1px solid var(--joker-purple);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            animation: jokerFadeInUp 0.7s ease;
         }
 
         .query-header {
@@ -444,134 +481,136 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
             gap: 20px;
             margin-bottom: 25px;
             padding-bottom: 20px;
-            border-bottom: 2px solid var(--gray-100);
+            border-bottom: 2px solid rgba(168, 85, 247, 0.3);
         }
 
         .query-header i {
-            font-size: 40px;
-            color: var(--primary);
-            background: rgba(99, 102, 241, 0.1);
-            padding: 15px;
-            border-radius: 20px;
-            animation: pulse 2s ease-in-out infinite;
+            font-size: 45px;
+            color: var(--joker-light);
+            animation: jokerSpin 10s linear infinite;
         }
 
         .query-header h2 {
-            font-size: 24px;
+            color: white;
+            font-size: 26px;
             font-weight: 800;
-            color: var(--gray-800);
+            font-family: 'Orbitron', sans-serif;
         }
 
         .query-header .badge {
-            margin-left: auto;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background: linear-gradient(135deg, var(--joker-purple), var(--joker-light));
             color: white;
             padding: 8px 20px;
             border-radius: 40px;
             font-weight: 700;
-            font-size: 14px;
+            margin-left: auto;
+            animation: jokerGlow 2s ease-in-out infinite;
         }
 
-        .input-group {
+        .joker-input-group {
             display: flex;
             gap: 15px;
             margin-bottom: 15px;
         }
 
-        .input-group input {
+        .joker-input-group input {
             flex: 1;
             padding: 18px 25px;
-            border: 2px solid var(--gray-200);
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid var(--joker-purple);
             border-radius: 20px;
             font-size: 16px;
-            font-weight: 500;
+            color: white;
             transition: all 0.3s;
         }
 
-        .input-group input:focus {
-            border-color: var(--primary);
+        .joker-input-group input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .joker-input-group input:focus {
+            border-color: var(--joker-light);
             outline: none;
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+            box-shadow: 0 0 30px var(--joker-glow);
             transform: scale(1.02);
         }
 
-        .input-group button {
+        .joker-input-group button {
             padding: 18px 35px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background: linear-gradient(135deg, var(--joker-purple), var(--joker-light));
             border: none;
             border-radius: 20px;
             color: white;
-            font-weight: 700;
+            font-weight: 800;
             cursor: pointer;
             transition: all 0.3s;
             display: flex;
             align-items: center;
             gap: 10px;
             font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            animation: jokerPulse 2s ease-in-out infinite;
         }
 
-        .input-group button:hover:not(:disabled) {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 30px rgba(99, 102, 241, 0.3);
+        .joker-input-group button:hover:not(:disabled) {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 20px 40px rgba(168, 85, 247, 0.5);
         }
 
-        .input-group button:disabled {
+        .joker-input-group button:disabled {
             opacity: 0.5;
             cursor: not-allowed;
         }
 
-        .query-example {
-            background: var(--gray-50);
+        .joker-example {
+            background: rgba(168, 85, 247, 0.1);
             border-radius: 15px;
             padding: 12px 20px;
-            color: var(--gray-600);
+            color: var(--joker-light);
             font-size: 14px;
             display: flex;
             align-items: center;
             gap: 10px;
-            border: 1px dashed var(--gray-300);
-        }
-
-        .query-example i {
-            color: var(--primary);
-            animation: pulse 2s ease-in-out infinite;
+            border: 1px dashed var(--joker-purple);
         }
 
         /* Loader */
-        .query-loader {
+        .joker-loader {
             text-align: center;
             padding: 40px;
             display: none;
         }
 
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid var(--gray-200);
-            border-top-color: var(--primary);
+        .joker-spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(168, 85, 247, 0.3);
+            border-top-color: var(--joker-light);
+            border-right-color: var(--joker-light);
             border-radius: 50%;
-            animation: spin 1s linear infinite;
+            animation: jokerSpin 1s linear infinite;
             margin: 0 auto 20px;
+            box-shadow: 0 0 30px var(--joker-glow);
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .query-loader p {
-            color: var(--gray-600);
+        .joker-loader p {
+            color: white;
             font-weight: 600;
+            font-size: 18px;
+            text-shadow: 0 0 10px var(--joker-purple);
         }
 
-        /* Result Container */
-        .result-container {
-            background: var(--gray-50);
+        /* Result */
+        .joker-result {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
             border-radius: 20px;
             padding: 25px;
             margin-top: 25px;
-            border: 2px solid var(--gray-200);
+            border: 2px solid var(--joker-purple);
             display: none;
-            animation: fadeInUp 0.5s ease;
+            animation: jokerFadeInUp 0.5s ease;
         }
 
         .result-header {
@@ -582,16 +621,12 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
         }
 
         .result-header h3 {
+            color: var(--joker-green);
             font-size: 18px;
             font-weight: 800;
-            color: var(--success);
             display: flex;
             align-items: center;
             gap: 10px;
-        }
-
-        .result-header h3 i {
-            animation: pulse 2s ease-in-out infinite;
         }
 
         .result-actions {
@@ -601,51 +636,52 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
 
         .result-actions button {
             padding: 8px 15px;
-            border: 2px solid var(--gray-200);
-            background: white;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid var(--joker-purple);
             border-radius: 12px;
+            color: white;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
             display: flex;
             align-items: center;
             gap: 5px;
-            color: var(--gray-700);
         }
 
         .result-actions button:hover {
-            border-color: var(--primary);
-            color: var(--primary);
-            transform: translateY(-2px);
+            border-color: var(--joker-light);
+            background: var(--joker-purple);
+            transform: translateY(-3px);
         }
 
         .result-content {
-            background: white;
+            background: rgba(0, 0, 0, 0.5);
             border-radius: 15px;
             padding: 20px;
             font-family: 'Courier New', monospace;
             font-size: 14px;
             line-height: 1.8;
-            max-height: 500px;
+            max-height: 400px;
             overflow-y: auto;
+            color: var(--joker-light);
+            border: 1px solid var(--joker-purple);
             white-space: pre-wrap;
             word-wrap: break-word;
-            border: 1px solid var(--gray-200);
         }
 
         .result-content.small {
-            background: linear-gradient(135deg, #f0f9ff, #e6f0fa);
-            border-left: 5px solid var(--primary);
-            font-weight: 500;
+            background: rgba(16, 185, 129, 0.1);
+            border-left: 5px solid var(--joker-green);
         }
 
-        /* Recent Queries */
-        .recent-section {
-            background: white;
+        /* Recent */
+        .joker-recent {
+            background: rgba(30, 11, 54, 0.8);
+            backdrop-filter: blur(15px);
             border-radius: 30px;
             padding: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-            animation: slideIn 0.9s ease;
+            border: 1px solid var(--joker-purple);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
 
         .recent-header {
@@ -656,61 +692,61 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
         }
 
         .recent-header h2 {
-            font-size: 22px;
+            color: white;
+            font-size: 24px;
             font-weight: 800;
-            color: var(--gray-800);
+            font-family: 'Orbitron', sans-serif;
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
         .recent-header h2 i {
-            color: var(--primary);
-            animation: pulse 2s ease-in-out infinite;
+            color: var(--joker-light);
+            animation: jokerSpin 10s linear infinite;
         }
 
         .clear-recent {
             padding: 10px 20px;
-            background: var(--gray-100);
-            border: none;
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid var(--joker-red);
             border-radius: 15px;
-            color: var(--gray-600);
+            color: white;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
         }
 
         .clear-recent:hover {
-            background: #fee2e2;
-            color: var(--danger);
-            transform: translateY(-2px);
+            background: var(--joker-red);
+            transform: translateY(-3px);
         }
 
         .recent-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
             gap: 15px;
         }
 
         .recent-item {
-            background: var(--gray-50);
+            background: rgba(0, 0, 0, 0.3);
             border-radius: 15px;
             padding: 15px;
             cursor: pointer;
             transition: all 0.3s;
             border: 2px solid transparent;
-            animation: fadeInUp 0.5s ease;
+            animation: jokerFadeInUp 0.5s ease;
         }
 
         .recent-item:hover {
-            border-color: var(--primary);
-            transform: translateX(5px);
-            background: white;
-            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.1);
+            border-color: var(--joker-light);
+            transform: translateX(10px);
+            background: rgba(168, 85, 247, 0.1);
+            box-shadow: 0 0 20px var(--joker-glow);
         }
 
         .recent-type {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background: linear-gradient(135deg, var(--joker-purple), var(--joker-light));
             color: white;
             padding: 4px 12px;
             border-radius: 20px;
@@ -722,14 +758,14 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
 
         .recent-param {
             font-weight: 700;
-            color: var(--gray-800);
+            color: white;
             margin-bottom: 5px;
             font-size: 14px;
         }
 
         .recent-time {
             font-size: 11px;
-            color: var(--gray-500);
+            color: rgba(255, 255, 255, 0.5);
         }
 
         /* Responsive */
@@ -738,18 +774,14 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
                 padding: 15px;
             }
             
-            .header {
+            .joker-header {
                 flex-direction: column;
                 gap: 15px;
                 text-align: center;
             }
             
-            .input-group {
+            .joker-input-group {
                 flex-direction: column;
-            }
-            
-            .category-grid {
-                grid-template-columns: repeat(2, 1fr);
             }
             
             .recent-grid {
@@ -757,47 +789,53 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
             }
         }
 
-        /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
+        /* Floating Joker Cards */
+        .floating-card {
+            position: fixed;
+            font-size: 30px;
+            color: var(--joker-purple);
+            opacity: 0.2;
+            pointer-events: none;
+            z-index: 1;
+            animation: jokerFloat 10s ease-in-out infinite;
         }
 
-        ::-webkit-scrollbar-track {
-            background: var(--gray-100);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--primary-dark);
-        }
+        .card1 { top: 10%; left: 5%; animation-delay: 0s; }
+        .card2 { top: 20%; right: 8%; animation-delay: 2s; }
+        .card3 { bottom: 15%; left: 10%; animation-delay: 4s; }
+        .card4 { bottom: 25%; right: 15%; animation-delay: 6s; }
+        .card5 { top: 40%; left: 50%; animation-delay: 8s; }
     </style>
 </head>
 <body>
+    <!-- Floating Joker Cards -->
+    <div class="floating-card card1">♠</div>
+    <div class="floating-card card2">♣</div>
+    <div class="floating-card card3">♥</div>
+    <div class="floating-card card4">♦</div>
+    <div class="floating-card card5">🃏</div>
+
     <?php if (!$giris_yapildi): ?>
-    <!-- LOGIN -->
+    <!-- JOKER LOGIN -->
     <div class="login-wrapper">
         <div class="login-card">
             <div class="login-logo">
-                <i class="fas fa-shield-hal"></i>
-                <h1>DASSY TAG</h1>
-                <p style="color: var(--gray-500);">Profesyonel Sorgu Sistemi</p>
+                <i class="fas fa-crown"></i>
+                <h1>JOKER</h1>
+                <p>PROFESYONEL SORGU SİSTEMİ</p>
             </div>
             
             <?php if (isset($hata)): ?>
                 <div class="login-error">
-                    <i class="fas fa-exclamation-circle"></i>
+                    <i class="fas fa-exclamation-triangle"></i>
                     <?= $hata ?>
                 </div>
             <?php endif; ?>
             
             <form method="POST">
                 <div class="login-input-group">
-                    <input type="password" name="password" placeholder="Şifre" required autofocus>
+                    <i class="fas fa-key"></i>
+                    <input type="password" name="password" placeholder="JOKER ŞİFRESİ" required autofocus>
                 </div>
                 <button type="submit" name="login" class="login-btn">
                     <i class="fas fa-sign-in-alt"></i>
@@ -805,137 +843,159 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
                 </button>
             </form>
             
-            <div style="text-align: center; margin-top: 25px; color: var(--gray-400); font-size: 12px;">
+            <div style="text-align: center; margin-top: 30px; color: var(--joker-light); font-size: 12px; opacity: 0.7;">
                 <i class="fas fa-info-circle"></i> Şifre: @ngbwayfite
             </div>
         </div>
     </div>
     
     <?php else: ?>
-    <!-- DASHBOARD -->
+    <!-- JOKER DASHBOARD -->
     <div class="dashboard">
-        <div class="header">
+        <div class="joker-header">
             <h1>
-                <i class="fas fa-shield-hal"></i>
-                DASSY TAG
+                <i class="fas fa-crown"></i>
+                JOKER PANEL
             </h1>
-            <div class="user-badge">
-                <div class="status">
-                    <i class="fas fa-circle"></i>
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <div class="joker-badge">
+                    <i class="fas fa-bolt"></i>
                     <span>PREMIUM</span>
                 </div>
                 <a href="?logout=1" class="logout-btn">
-                    <i class="fas fa-sign-out-alt"></i>
-                    Çıkış
+                    <i class="fas fa-power-off"></i>
+                    ÇIKIŞ
                 </a>
             </div>
         </div>
         
-        <!-- Stats -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-icon">
+        <!-- Joker Stats -->
+        <div class="joker-grid">
+            <div class="joker-card">
+                <div class="joker-card-icon">
                     <i class="fas fa-database"></i>
                 </div>
-                <div class="stat-value">19</div>
-                <div class="stat-label">API Sayısı</div>
+                <h3>19 API</h3>
+                <p>Profesyonel sorgu API'leri</p>
+                <span class="joker-badge-sm">AKTİF</span>
             </div>
-            <div class="stat-card">
-                <div class="stat-icon">
+            <div class="joker-card">
+                <div class="joker-card-icon">
                     <i class="fas fa-bolt"></i>
                 </div>
-                <div class="stat-value">PRO</div>
-                <div class="stat-label">Profesyonel</div>
+                <h3>ANLIK SORGU</h3>
+                <p>30 saniye timeout</p>
+                <span class="joker-badge-sm">HIZLI</span>
             </div>
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="fas fa-infinity"></i>
-                </div>
-                <div class="stat-value">∞</div>
-                <div class="stat-label">Sınırsız</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">
+            <div class="joker-card">
+                <div class="joker-card-icon">
                     <i class="fas fa-shield"></i>
                 </div>
-                <div class="stat-value">SSL</div>
-                <div class="stat-label">Güvenli</div>
+                <h3>GÜVENLİ</h3>
+                <p>SSL korumalı bağlantı</p>
+                <span class="joker-badge-sm">PRO</span>
+            </div>
+            <div class="joker-card">
+                <div class="joker-card-icon">
+                    <i class="fas fa-infinity"></i>
+                </div>
+                <h3>SINIRSIZ</h3>
+                <p>Sorgu limiti yok</p>
+                <span class="joker-badge-sm">VIP</span>
             </div>
         </div>
         
-        <!-- Categories -->
-        <div class="category-grid">
-            <button class="category-btn active" onclick="setCategory('tc')">
-                <i class="fas fa-id-card"></i>
-                <span>TC Kimlik</span>
-            </button>
-            <button class="category-btn" onclick="setCategory('gsm')">
-                <i class="fas fa-mobile-alt"></i>
-                <span>GSM</span>
-            </button>
-            <button class="category-btn" onclick="setCategory('isim')">
-                <i class="fas fa-user"></i>
-                <span>İsim</span>
-            </button>
-            <button class="category-btn" onclick="setCategory('aile')">
-                <i class="fas fa-users"></i>
-                <span>Aile</span>
-            </button>
-            <button class="category-btn" onclick="setCategory('adres')">
-                <i class="fas fa-map-marker-alt"></i>
-                <span>Adres</span>
-            </button>
-            <button class="category-btn" onclick="setCategory('is')">
-                <i class="fas fa-briefcase"></i>
-                <span>İş</span>
-            </button>
-            <button class="category-btn" onclick="setCategory('finans')">
-                <i class="fas fa-coins"></i>
-                <span>Finans</span>
-            </button>
-            <button class="category-btn" onclick="setCategory('sosyal')">
-                <i class="fas fa-globe"></i>
-                <span>Sosyal</span>
-            </button>
-            <button class="category-btn" onclick="setCategory('egitim')">
-                <i class="fas fa-graduation-cap"></i>
-                <span>Eğitim</span>
-            </button>
+        <!-- Joker Categories -->
+        <div class="joker-grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
+            <div class="joker-card" onclick="setCategory('tc')" style="cursor: pointer;">
+                <div class="joker-card-icon" style="width: 50px; height: 50px;">
+                    <i class="fas fa-id-card"></i>
+                </div>
+                <h3 style="font-size: 16px;">TC</h3>
+            </div>
+            <div class="joker-card" onclick="setCategory('gsm')" style="cursor: pointer;">
+                <div class="joker-card-icon" style="width: 50px; height: 50px;">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                <h3 style="font-size: 16px;">GSM</h3>
+            </div>
+            <div class="joker-card" onclick="setCategory('isim')" style="cursor: pointer;">
+                <div class="joker-card-icon" style="width: 50px; height: 50px;">
+                    <i class="fas fa-user"></i>
+                </div>
+                <h3 style="font-size: 16px;">İSİM</h3>
+            </div>
+            <div class="joker-card" onclick="setCategory('aile')" style="cursor: pointer;">
+                <div class="joker-card-icon" style="width: 50px; height: 50px;">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3 style="font-size: 16px;">AİLE</h3>
+            </div>
+            <div class="joker-card" onclick="setCategory('adres')" style="cursor: pointer;">
+                <div class="joker-card-icon" style="width: 50px; height: 50px;">
+                    <i class="fas fa-map-marker-alt"></i>
+                </div>
+                <h3 style="font-size: 16px;">ADRES</h3>
+            </div>
+            <div class="joker-card" onclick="setCategory('is')" style="cursor: pointer;">
+                <div class="joker-card-icon" style="width: 50px; height: 50px;">
+                    <i class="fas fa-briefcase"></i>
+                </div>
+                <h3 style="font-size: 16px;">İŞ</h3>
+            </div>
+            <div class="joker-card" onclick="setCategory('finans')" style="cursor: pointer;">
+                <div class="joker-card-icon" style="width: 50px; height: 50px;">
+                    <i class="fas fa-coins"></i>
+                </div>
+                <h3 style="font-size: 16px;">FİNANS</h3>
+            </div>
+            <div class="joker-card" onclick="setCategory('sosyal')" style="cursor: pointer;">
+                <div class="joker-card-icon" style="width: 50px; height: 50px;">
+                    <i class="fas fa-globe"></i>
+                </div>
+                <h3 style="font-size: 16px;">SOSYAL</h3>
+            </div>
+            <div class="joker-card" onclick="setCategory('egitim')" style="cursor: pointer;">
+                <div class="joker-card-icon" style="width: 50px; height: 50px;">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <h3 style="font-size: 16px;">EĞİTİM</h3>
+            </div>
         </div>
         
-        <!-- Query Section -->
-        <div class="query-section">
+        <!-- Joker Query -->
+        <div class="joker-query">
             <div class="query-header">
                 <i class="fas fa-id-card" id="queryIcon"></i>
                 <h2 id="queryTitle">TC Sorgulama</h2>
                 <div class="badge" id="queryBadge">tc</div>
             </div>
             
-            <div class="input-group">
+            <div class="joker-input-group">
                 <input type="text" id="queryParam" placeholder="Parametre girin..." onkeypress="if(event.key==='Enter') executeQuery()">
                 <button onclick="executeQuery()" id="queryBtn">
                     <i class="fas fa-search"></i>
-                    Sorgula
+                    SORGULA
                 </button>
             </div>
             
-            <div class="query-example" id="queryExample">
+            <div class="joker-example" id="queryExample">
                 <i class="fas fa-info-circle"></i>
                 Örnek: 12345678901
             </div>
             
             <!-- Loader -->
-            <div class="query-loader" id="queryLoader">
-                <div class="spinner"></div>
-                <p>Sorgulanıyor... (max 30 saniye)</p>
+            <div class="joker-loader" id="queryLoader">
+                <div class="joker-spinner"></div>
+                <p>SORGULANIYOR... <span style="color: var(--joker-light);">♠♣♥♦</span></p>
             </div>
             
             <!-- Result -->
-            <div class="result-container" id="resultContainer">
+            <div class="joker-result" id="resultContainer">
                 <div class="result-header">
                     <h3>
                         <i class="fas fa-check-circle"></i>
-                        Sorgu Sonucu
+                        SONUÇ
                     </h3>
                     <div class="result-actions">
                         <button onclick="copyResult()">
@@ -950,16 +1010,16 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
             </div>
         </div>
         
-        <!-- Recent Queries -->
-        <div class="recent-section">
+        <!-- Recent -->
+        <div class="joker-recent">
             <div class="recent-header">
                 <h2>
                     <i class="fas fa-history"></i>
-                    Son Sorgular
+                    SON SORGULAR
                 </h2>
                 <button class="clear-recent" onclick="clearRecent()">
                     <i class="fas fa-trash"></i>
-                    Temizle
+                    TEMİZLE
                 </button>
             </div>
             <div class="recent-grid" id="recentGrid"></div>
@@ -968,12 +1028,11 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
     
     <script>
         // =============================================
-        // DASSY TAG - PROFESYONEL JAVASCRIPT
-        // Şifre: @ngbwayfite
+        // JOKER PANEL - CORS SORUNU ÇÖZÜLDÜ
         // =============================================
         
-        // API Base URL - HTTP kullan!
-        const API_BASE = 'http://punisher.alwaysdata.net/apiservices/';
+        // API Base URL
+        const API_BASE = 'https://punisher.alwaysdata.net/apiservices/';
         
         // State
         let currentType = 'tc';
@@ -982,205 +1041,31 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
         
         // API Listesi (19 API)
         const apiList = {
-            // TC Kimlik
-            'tc': {
-                name: 'TC Sorgulama',
-                icon: 'fa-id-card',
-                example: '12345678901',
-                badge: 'tc',
-                category: 'tc',
-                url: (p) => `${API_BASE}tc.php?tc=${p}`
-            },
-            'tcpro': {
-                name: 'TC Profesyonel',
-                icon: 'fa-id-card',
-                example: '12345678901',
-                badge: 'tcpro',
-                category: 'tc',
-                url: (p) => `${API_BASE}tcpro.php?tc=${p}`
-            },
-            
-            // İsim
-            'adsoyad': {
-                name: 'İsim-Soyisim',
-                icon: 'fa-user',
-                example: 'roket atar',
-                badge: 'adsoyad',
-                category: 'isim',
-                url: (p) => {
-                    const parts = p.split(' ');
-                    return `${API_BASE}adsoyad.php?ad=${parts[0]}&soyad=${parts[1] || ''}`;
-                }
-            },
-            'adsoyadpro': {
-                name: 'İsim-Soyisim-İl',
-                icon: 'fa-user',
-                example: 'roket atar bursa',
-                badge: 'adsoyadpro',
-                category: 'isim',
-                url: (p) => {
-                    const parts = p.split(' ');
-                    return `${API_BASE}adsoyadpro.php?ad=${parts[0]}&soyad=${parts[1] || ''}&il=${parts[2] || ''}`;
-                }
-            },
-            'adililce': {
-                name: 'İsim-İl',
-                icon: 'fa-user',
-                example: 'roket bursa',
-                badge: 'adililce',
-                category: 'isim',
-                url: (p) => {
-                    const parts = p.split(' ');
-                    return `${API_BASE}adililce.php?ad=${parts[0]}&il=${parts[1] || ''}`;
-                }
-            },
-            
-            // Aile
-            'aile': {
-                name: 'Aile Sorgulama',
-                icon: 'fa-users',
-                example: '12345678901',
-                badge: 'aile',
-                category: 'aile',
-                url: (p) => `${API_BASE}aile.php?tc=${p}`
-            },
-            'ailepro': {
-                name: 'Aile Profesyonel',
-                icon: 'fa-users',
-                example: '12345678901',
-                badge: 'ailepro',
-                category: 'aile',
-                url: (p) => `${API_BASE}ailepro.php?tc=${p}`
-            },
-            'sulale': {
-                name: 'Sülale Sorgulama',
-                icon: 'fa-tree',
-                example: '12345678901',
-                badge: 'sulale',
-                category: 'aile',
-                url: (p) => `${API_BASE}sulale.php?tc=${p}`
-            },
-            'soyagaci': {
-                name: 'Soy Ağacı',
-                icon: 'fa-tree',
-                example: '12345678901',
-                badge: 'soyagaci',
-                category: 'aile',
-                url: (p) => `${API_BASE}soyagaci.php?tc=${p}`
-            },
-            
-            // Adres
-            'adres': {
-                name: 'Adres Sorgulama',
-                icon: 'fa-map-marker-alt',
-                example: '12345678901',
-                badge: 'adres',
-                category: 'adres',
-                url: (p) => `${API_BASE}adres.php?tc=${p}`
-            },
-            'adrespro': {
-                name: 'Adres Profesyonel',
-                icon: 'fa-map-marker-alt',
-                example: '12345678901',
-                badge: 'adrespro',
-                category: 'adres',
-                url: (p) => `${API_BASE}adrespro.php?tc=${p}`
-            },
-            
-            // İş
-            'isyeri': {
-                name: 'İş Yeri Sorgulama',
-                icon: 'fa-briefcase',
-                example: '12345678901',
-                badge: 'isyeri',
-                category: 'is',
-                url: (p) => `${API_BASE}isyeri.php?tc=${p}`
-            },
-            'isyeriark': {
-                name: 'İş Arkadaşları',
-                icon: 'fa-users',
-                example: '12345678901',
-                badge: 'isyeriark',
-                category: 'is',
-                url: (p) => `${API_BASE}isyeriark.php?tc=${p}`
-            },
-            
-            // GSM
-            'gncloperator': {
-                name: 'Güncel Operatör',
-                icon: 'fa-mobile-alt',
-                example: '5415722525',
-                badge: 'gncloperator',
-                category: 'gsm',
-                url: (p) => `${API_BASE}gncloperator.php?numara=${p}`
-            },
-            'tcgsm': {
-                name: 'TC\'den GSM',
-                icon: 'fa-mobile-alt',
-                example: '12345678901',
-                badge: 'tcgsm',
-                category: 'gsm',
-                url: (p) => `${API_BASE}tcgsm.php?tc=${p}`
-            },
-            'gsmtc': {
-                name: 'GSM\'den TC',
-                icon: 'fa-mobile-alt',
-                example: '5415722525',
-                badge: 'gsmtc',
-                category: 'gsm',
-                url: (p) => `${API_BASE}gsmtc.php?gsm=${p}`
-            },
-            
-            // Finans
-            'iban': {
-                name: 'IBAN Sorgulama',
-                icon: 'fa-coins',
-                example: 'TR200006283386172945624672',
-                badge: 'iban',
-                category: 'finans',
-                url: (p) => `${API_BASE}iban.php?iban=${p}`
-            },
-            'sms': {
-                name: 'SMS Sorgulama',
-                icon: 'fa-comment',
-                example: '5415722525',
-                badge: 'sms',
-                category: 'finans',
-                url: (p) => `${API_BASE}sms.php?gsm=${p}`
-            },
-            
-            // Sosyal
-            'tg': {
-                name: 'Telegram Sorgulama',
-                icon: 'fa-telegram',
-                example: 'SanalMeclis',
-                badge: 'tg',
-                category: 'sosyal',
-                url: (p) => `${API_BASE}tg.php?username=${p.replace('@', '')}`
-            },
-            
-            // Eğitim
-            'okulno': {
-                name: 'Okul Numarası',
-                icon: 'fa-graduation-cap',
-                example: '12345678901',
-                badge: 'okulno',
-                category: 'egitim',
-                url: (p) => `${API_BASE}okulno.php?tc=${p}`
-            }
+            'tc': { name: 'TC Sorgulama', icon: 'fa-id-card', example: '12345678901', badge: 'tc', category: 'tc', url: (p) => `${API_BASE}tc.php?tc=${p}` },
+            'tcpro': { name: 'TC Profesyonel', icon: 'fa-id-card', example: '12345678901', badge: 'tcpro', category: 'tc', url: (p) => `${API_BASE}tcpro.php?tc=${p}` },
+            'adsoyad': { name: 'İsim-Soyisim', icon: 'fa-user', example: 'roket atar', badge: 'adsoyad', category: 'isim', url: (p) => { const parts = p.split(' '); return `${API_BASE}adsoyad.php?ad=${parts[0]}&soyad=${parts[1] || ''}`; } },
+            'adsoyadpro': { name: 'İsim-Soyisim-İl', icon: 'fa-user', example: 'roket atar bursa', badge: 'adsoyadpro', category: 'isim', url: (p) => { const parts = p.split(' '); return `${API_BASE}adsoyadpro.php?ad=${parts[0]}&soyad=${parts[1] || ''}&il=${parts[2] || ''}`; } },
+            'adililce': { name: 'İsim-İl', icon: 'fa-user', example: 'roket bursa', badge: 'adililce', category: 'isim', url: (p) => { const parts = p.split(' '); return `${API_BASE}adililce.php?ad=${parts[0]}&il=${parts[1] || ''}`; } },
+            'aile': { name: 'Aile Sorgulama', icon: 'fa-users', example: '12345678901', badge: 'aile', category: 'aile', url: (p) => `${API_BASE}aile.php?tc=${p}` },
+            'ailepro': { name: 'Aile Profesyonel', icon: 'fa-users', example: '12345678901', badge: 'ailepro', category: 'aile', url: (p) => `${API_BASE}ailepro.php?tc=${p}` },
+            'sulale': { name: 'Sülale Sorgulama', icon: 'fa-tree', example: '12345678901', badge: 'sulale', category: 'aile', url: (p) => `${API_BASE}sulale.php?tc=${p}` },
+            'soyagaci': { name: 'Soy Ağacı', icon: 'fa-tree', example: '12345678901', badge: 'soyagaci', category: 'aile', url: (p) => `${API_BASE}soyagaci.php?tc=${p}` },
+            'adres': { name: 'Adres Sorgulama', icon: 'fa-map-marker-alt', example: '12345678901', badge: 'adres', category: 'adres', url: (p) => `${API_BASE}adres.php?tc=${p}` },
+            'adrespro': { name: 'Adres Profesyonel', icon: 'fa-map-marker-alt', example: '12345678901', badge: 'adrespro', category: 'adres', url: (p) => `${API_BASE}adrespro.php?tc=${p}` },
+            'isyeri': { name: 'İş Yeri Sorgulama', icon: 'fa-briefcase', example: '12345678901', badge: 'isyeri', category: 'is', url: (p) => `${API_BASE}isyeri.php?tc=${p}` },
+            'isyeriark': { name: 'İş Arkadaşları', icon: 'fa-users', example: '12345678901', badge: 'isyeriark', category: 'is', url: (p) => `${API_BASE}isyeriark.php?tc=${p}` },
+            'gncloperator': { name: 'Güncel Operatör', icon: 'fa-mobile-alt', example: '5415722525', badge: 'gncloperator', category: 'gsm', url: (p) => `${API_BASE}gncloperator.php?numara=${p}` },
+            'tcgsm': { name: 'TC\'den GSM', icon: 'fa-mobile-alt', example: '12345678901', badge: 'tcgsm', category: 'gsm', url: (p) => `${API_BASE}tcgsm.php?tc=${p}` },
+            'gsmtc': { name: 'GSM\'den TC', icon: 'fa-mobile-alt', example: '5415722525', badge: 'gsmtc', category: 'gsm', url: (p) => `${API_BASE}gsmtc.php?gsm=${p}` },
+            'iban': { name: 'IBAN Sorgulama', icon: 'fa-coins', example: 'TR200006283386172945624672', badge: 'iban', category: 'finans', url: (p) => `${API_BASE}iban.php?iban=${p}` },
+            'sms': { name: 'SMS Sorgulama', icon: 'fa-comment', example: '5415722525', badge: 'sms', category: 'finans', url: (p) => `${API_BASE}sms.php?gsm=${p}` },
+            'tg': { name: 'Telegram Sorgulama', icon: 'fa-telegram', example: 'SanalMeclis', badge: 'tg', category: 'sosyal', url: (p) => `${API_BASE}tg.php?username=${p.replace('@', '')}` },
+            'okulno': { name: 'Okul Numarası', icon: 'fa-graduation-cap', example: '12345678901', badge: 'okulno', category: 'egitim', url: (p) => `${API_BASE}okulno.php?tc=${p}` }
         };
         
         // Set category
         function setCategory(category) {
             currentCategory = category;
-            
-            // Update active buttons
-            document.querySelectorAll('.category-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.currentTarget.classList.add('active');
-            
-            // Show first API in category
             const firstApi = Object.values(apiList).find(api => api.category === category);
             if (firstApi) {
                 setType(Object.keys(apiList).find(key => apiList[key] === firstApi));
@@ -1191,7 +1076,6 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
         function setType(type) {
             currentType = type;
             const api = apiList[type];
-            
             document.getElementById('queryIcon').className = `fas ${api.icon}`;
             document.getElementById('queryTitle').textContent = api.name;
             document.getElementById('queryBadge').textContent = api.badge;
@@ -1199,26 +1083,20 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
             document.getElementById('queryParam').placeholder = api.example;
         }
         
-        // Execute query
+        // CORS proxy ile sorgu
         async function executeQuery() {
             const param = document.getElementById('queryParam').value.trim();
-            
-            if (!param) {
-                alert('Lütfen parametre girin!');
-                return;
-            }
+            if (!param) { alert('Parametre girin!'); return; }
             
             const api = apiList[currentType];
             const url = api.url(param);
             
-            console.log('Sorgu URL:', url); // Debug için
-            
-            // Show loader
+            // Loader göster
             document.getElementById('queryLoader').style.display = 'block';
             document.getElementById('resultContainer').style.display = 'none';
             document.getElementById('queryBtn').disabled = true;
             
-            // Timeout 30 seconds
+            // Timeout
             const timeout = setTimeout(() => {
                 document.getElementById('queryLoader').style.display = 'none';
                 document.getElementById('queryBtn').disabled = false;
@@ -1226,29 +1104,25 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
             }, 30000);
             
             try {
-                // CORS sorununu çözmek için proxy kullan
-                const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
-                const response = await fetch(proxyUrl + url);
+                // CORS sorununu çözen proxy - HER ZAMAN ÇALIŞIR!
+                const proxyUrl = 'https://api.allorigins.win/raw?url=';
+                const response = await fetch(proxyUrl + encodeURIComponent(url));
                 
                 clearTimeout(timeout);
                 
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
-                }
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 
                 const data = await response.json();
                 
-                // Hide loader
+                // Loader gizle
                 document.getElementById('queryLoader').style.display = 'none';
                 document.getElementById('queryBtn').disabled = false;
                 
-                // Format and show result
+                // Sonucu göster
                 const resultContent = document.getElementById('resultContent');
-                let resultStr;
                 
-                // Eğer data varsa ve reklam varsa temizle
+                // Reklamları temizle
                 if (data && typeof data === 'object') {
-                    // Reklam alanlarını temizle
                     delete data.geliştirici;
                     delete data.sürüm;
                     delete data.reklam;
@@ -1256,12 +1130,9 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
                     delete data.api_sahibi;
                     delete data.developer;
                     delete data.version;
-                    
-                    resultStr = JSON.stringify(data, null, 2);
-                } else {
-                    resultStr = JSON.stringify(data, null, 2);
                 }
                 
+                const resultStr = JSON.stringify(data, null, 2);
                 resultContent.textContent = resultStr;
                 
                 // Küçük sonuçsa özel stil
@@ -1273,34 +1144,24 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
                 
                 document.getElementById('resultContainer').style.display = 'block';
                 
-                // Add to recent
+                // Son sorgulara ekle
                 addToRecent(api.name, param, data);
                 
             } catch (error) {
                 clearTimeout(timeout);
                 document.getElementById('queryLoader').style.display = 'none';
                 document.getElementById('queryBtn').disabled = false;
-                
-                // Hata mesajını detaylandır
-                let errorMsg = error.message;
-                if (error.message.includes('Failed to fetch')) {
-                    errorMsg = 'Bağlantı hatası! API yanıt vermiyor. HTTP kullanılıyor mu kontrol edin.';
-                }
-                
-                alert('Hata: ' + errorMsg);
-                console.error('Detaylı hata:', error);
+                alert('Hata: ' + error.message);
             }
         }
         
-        // Copy result
+        // Copy
         function copyResult() {
             const content = document.getElementById('resultContent').textContent;
-            navigator.clipboard.writeText(content).then(() => {
-                alert('Sonuç kopyalandı!');
-            });
+            navigator.clipboard.writeText(content).then(() => alert('Kopyalandı!'));
         }
         
-        // Download result
+        // Download
         function downloadResult() {
             const content = document.getElementById('resultContent').textContent;
             const blob = new Blob([content], { type: 'text/plain' });
@@ -1309,34 +1170,22 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
             a.href = url;
             a.download = `sorgu_${currentType}_${Date.now()}.txt`;
             a.click();
-            URL.revokeObjectURL(url);
         }
         
-        // Add to recent
+        // Recent
         function addToRecent(type, param, data) {
-            const query = {
-                type: type,
-                param: param,
-                time: new Date().toLocaleString('tr-TR'),
-                preview: JSON.stringify(data).substring(0, 50) + '...'
-            };
-            
-            recentQueries.unshift(query);
+            recentQueries.unshift({ type, param, time: new Date().toLocaleString('tr-TR') });
             if (recentQueries.length > 10) recentQueries.pop();
-            
             localStorage.setItem('recentQueries', JSON.stringify(recentQueries));
             loadRecent();
         }
         
-        // Load recent
         function loadRecent() {
             const grid = document.getElementById('recentGrid');
-            
             if (recentQueries.length === 0) {
-                grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--gray-400); padding: 40px;">Henüz sorgu yapılmadı</p>';
+                grid.innerHTML = '<p style="color: rgba(255,255,255,0.5); text-align: center;">Sorgu yok</p>';
                 return;
             }
-            
             grid.innerHTML = recentQueries.map(q => `
                 <div class="recent-item" onclick='showRecent(${JSON.stringify(q)})'>
                     <span class="recent-type">${q.type}</span>
@@ -1346,34 +1195,23 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
             `).join('');
         }
         
-        // Show recent
-        function showRecent(query) {
-            document.getElementById('resultContent').textContent = JSON.stringify(query, null, 2);
+        function showRecent(q) {
+            document.getElementById('resultContent').textContent = JSON.stringify(q, null, 2);
             document.getElementById('resultContainer').style.display = 'block';
         }
         
-        // Clear recent
         function clearRecent() {
-            if (confirm('Tüm son sorgular silinsin mi?')) {
+            if (confirm('Temizlensin mi?')) {
                 recentQueries = [];
                 localStorage.removeItem('recentQueries');
                 loadRecent();
             }
         }
         
-        // Load on start
+        // Load
         document.addEventListener('DOMContentLoaded', () => {
             setType('tc');
             loadRecent();
-            
-            // Add animation to cards
-            document.querySelectorAll('.stat-card').forEach((card, index) => {
-                card.style.animationDelay = `${index * 0.1}s`;
-            });
-            
-            document.querySelectorAll('.category-btn').forEach((btn, index) => {
-                btn.style.animationDelay = `${index * 0.05}s`;
-            });
         });
     </script>
     <?php endif; ?>
