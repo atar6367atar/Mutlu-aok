@@ -1,8 +1,12 @@
 <?php
 session_start();
 
-// Şifre
-define('SIFRE', 'CDNmutluhosting');
+// =============================================
+// DASSY TAG - ULTRA PROFESYONEL SORGU PANELİ
+// Şifre: @ngbwayfite
+// =============================================
+
+define('SIFRE', '@ngbwayfite');
 
 // Logout
 if (isset($_GET['logout'])) {
@@ -11,7 +15,7 @@ if (isset($_GET['logout'])) {
     exit;
 }
 
-// Giriş işlemi
+// Login
 if (isset($_POST['login'])) {
     if ($_POST['password'] === SIFRE) {
         $_SESSION['loggedin'] = true;
@@ -27,284 +31,553 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DASSY TAG | Sorgu Paneli</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>DASSY TAG | Profesyonel Sorgu Sistemi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        /* ===== RESET & VARIABLES ===== */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #818cf8;
+            --secondary: #8b5cf6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #0f172a;
+            --light: #f8fafc;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
         }
 
         body {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
         }
 
-        /* Login */
-        .login-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        /* ===== ANİMASYONLAR ===== */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+
+        @keyframes glow {
+            0% { box-shadow: 0 0 5px rgba(99, 102, 241, 0.2); }
+            50% { box-shadow: 0 0 30px rgba(99, 102, 241, 0.6); }
+            100% { box-shadow: 0 0 5px rgba(99, 102, 241, 0.2); }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* ===== LOGIN SAYFASI ===== */
+        .login-wrapper {
             min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             padding: 20px;
+            animation: fadeInUp 0.8s ease;
         }
 
-        .login-box {
-            background: white;
-            border-radius: 30px;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+        .login-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 40px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
             padding: 50px;
             width: 100%;
-            max-width: 400px;
+            max-width: 450px;
+            animation: float 6s ease-in-out infinite;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        .logo {
+        .login-logo {
             text-align: center;
             margin-bottom: 40px;
+            animation: slideIn 0.6s ease;
         }
 
-        .logo i {
-            font-size: 60px;
-            color: #667eea;
+        .login-logo i {
+            font-size: 70px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: pulse 2s ease-in-out infinite;
         }
 
-        .logo h1 {
-            font-size: 32px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+        .login-logo h1 {
+            font-size: 36px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin: 15px 0 5px;
+            letter-spacing: -1px;
         }
 
-        .input-group {
-            margin-bottom: 20px;
+        .login-input-group {
+            margin-bottom: 25px;
+            animation: slideIn 0.7s ease;
         }
 
-        .input-group input {
+        .login-input-group input {
             width: 100%;
-            padding: 15px 20px;
-            border: 2px solid #e0e0e0;
-            border-radius: 15px;
+            padding: 18px 25px;
+            border: 2px solid var(--gray-200);
+            border-radius: 20px;
             font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s;
+            background: white;
         }
 
-        .input-group input:focus {
-            border-color: #667eea;
+        .login-input-group input:focus {
+            border-color: var(--primary);
             outline: none;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+            transform: scale(1.02);
         }
 
         .login-btn {
             width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            padding: 18px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             border: none;
-            border-radius: 15px;
+            border-radius: 20px;
             color: white;
             font-size: 16px;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .login-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .login-btn:hover::before {
+            left: 100%;
         }
 
         .login-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(102,126,234,0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(99, 102, 241, 0.4);
         }
 
-        .error {
-            background: #fee;
-            color: #e74c3c;
-            padding: 12px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            text-align: center;
+        .login-error {
+            background: linear-gradient(135deg, #fee2e2, #fecaca);
+            color: var(--danger);
+            padding: 15px 20px;
+            border-radius: 20px;
+            margin-bottom: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            animation: shake 0.5s;
         }
 
-        /* Dashboard */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        /* ===== DASHBOARD ===== */
         .dashboard {
-            max-width: 1200px;
-            margin: 0 auto;
+            min-height: 100vh;
+            background: var(--gray-50);
             padding: 30px;
+            animation: fadeInUp 0.8s ease;
         }
 
         .header {
             background: white;
-            border-radius: 20px;
-            padding: 20px 30px;
+            border-radius: 30px;
+            padding: 25px 35px;
             margin-bottom: 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            animation: slideIn 0.6s ease;
+            border: 1px solid rgba(255, 255, 255, 0.5);
         }
 
         .header h1 {
-            font-size: 24px;
-            color: #2c3e50;
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
         .header h1 i {
-            color: #667eea;
-            margin-right: 10px;
+            font-size: 32px;
+            animation: rotate 10s linear infinite;
+        }
+
+        .user-badge {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .status {
+            background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+            padding: 10px 20px;
+            border-radius: 40px;
+            color: #065f46;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status i {
+            color: #10b981;
+            animation: pulse 2s ease-in-out infinite;
         }
 
         .logout-btn {
-            background: #fee;
-            color: #e74c3c;
+            background: #fee2e2;
+            color: var(--danger);
             border: none;
-            padding: 10px 20px;
-            border-radius: 10px;
-            font-weight: 600;
+            padding: 10px 25px;
+            border-radius: 40px;
+            font-weight: 700;
             cursor: pointer;
+            transition: all 0.3s;
             text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .quick-actions {
+        .logout-btn:hover {
+            background: #fecaca;
+            transform: translateY(-2px);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 25px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+            animation: slideIn 0.7s ease;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.15);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        .stat-icon i {
+            font-size: 28px;
+            color: var(--primary);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--gray-800);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: var(--gray-500);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        /* Category Grid */
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 15px;
             margin-bottom: 30px;
         }
 
-        .quick-btn {
+        .category-btn {
             background: white;
-            border: none;
-            border-radius: 15px;
+            border: 2px solid var(--gray-200);
+            border-radius: 20px;
             padding: 20px;
             cursor: pointer;
             transition: all 0.3s;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+            font-weight: 700;
+            color: var(--gray-700);
+            animation: fadeInUp 0.5s ease;
         }
 
-        .quick-btn i {
+        .category-btn i {
             font-size: 28px;
-            color: #667eea;
+            color: var(--primary);
+            transition: all 0.3s;
         }
 
-        .quick-btn:hover {
+        .category-btn:hover {
+            border-color: var(--primary);
             transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(102,126,234,0.3);
+            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.2);
         }
 
-        .query-box {
+        .category-btn:hover i {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .category-btn.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-color: transparent;
+            color: white;
+        }
+
+        .category-btn.active i {
+            color: white;
+        }
+
+        /* Query Section */
+        .query-section {
             background: white;
-            border-radius: 20px;
+            border-radius: 30px;
             padding: 30px;
             margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            animation: slideIn 0.8s ease;
         }
 
-        .query-type {
+        .query-header {
             display: flex;
             align-items: center;
-            gap: 15px;
-            margin-bottom: 20px;
+            gap: 20px;
+            margin-bottom: 25px;
             padding-bottom: 20px;
-            border-bottom: 2px solid #f0f0f0;
+            border-bottom: 2px solid var(--gray-100);
         }
 
-        .query-type i {
-            font-size: 32px;
-            color: #667eea;
-            background: rgba(102,126,234,0.1);
+        .query-header i {
+            font-size: 40px;
+            color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
             padding: 15px;
-            border-radius: 15px;
+            border-radius: 20px;
+            animation: pulse 2s ease-in-out infinite;
         }
 
-        .query-type h2 {
+        .query-header h2 {
             font-size: 24px;
-            color: #2c3e50;
+            font-weight: 800;
+            color: var(--gray-800);
         }
 
-        .query-type span {
-            background: #667eea;
-            color: white;
-            padding: 5px 15px;
-            border-radius: 30px;
-            font-size: 14px;
+        .query-header .badge {
             margin-left: auto;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 14px;
         }
 
-        .input-area {
+        .input-group {
             display: flex;
             gap: 15px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
-        .input-area input {
+        .input-group input {
             flex: 1;
-            padding: 15px 20px;
-            border: 2px solid #e0e0e0;
-            border-radius: 15px;
+            padding: 18px 25px;
+            border: 2px solid var(--gray-200);
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .input-group input:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+            transform: scale(1.02);
+        }
+
+        .input-group button {
+            padding: 18px 35px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            border-radius: 20px;
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
             font-size: 16px;
         }
 
-        .input-area input:focus {
-            border-color: #667eea;
-            outline: none;
+        .input-group button:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(99, 102, 241, 0.3);
         }
 
-        .input-area button {
-            padding: 15px 30px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            border: none;
-            border-radius: 15px;
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .input-area button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(102,126,234,0.4);
-        }
-
-        .input-area button:disabled {
+        .input-group button:disabled {
             opacity: 0.5;
             cursor: not-allowed;
         }
 
-        .example {
-            color: #7f8c8d;
+        .query-example {
+            background: var(--gray-50);
+            border-radius: 15px;
+            padding: 12px 20px;
+            color: var(--gray-600);
             font-size: 14px;
-            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px dashed var(--gray-300);
         }
 
-        .loader {
-            display: none;
+        .query-example i {
+            color: var(--primary);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        /* Loader */
+        .query-loader {
             text-align: center;
-            padding: 30px;
+            padding: 40px;
+            display: none;
         }
 
         .spinner {
             width: 50px;
             height: 50px;
-            border: 4px solid #f3f3f3;
-            border-top-color: #667eea;
+            border: 4px solid var(--gray-200);
+            border-top-color: var(--primary);
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin: 0 auto 15px;
+            margin: 0 auto 20px;
         }
 
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
 
-        .result {
-            background: #f8f9fa;
-            border-radius: 15px;
-            padding: 20px;
-            margin-top: 20px;
+        .query-loader p {
+            color: var(--gray-600);
+            font-weight: 600;
+        }
+
+        /* Result Container */
+        .result-container {
+            background: var(--gray-50);
+            border-radius: 20px;
+            padding: 25px;
+            margin-top: 25px;
+            border: 2px solid var(--gray-200);
             display: none;
+            animation: fadeInUp 0.5s ease;
         }
 
         .result-header {
@@ -315,10 +588,16 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
         }
 
         .result-header h3 {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--success);
             display: flex;
             align-items: center;
             gap: 10px;
-            color: #27ae60;
+        }
+
+        .result-header h3 i {
+            animation: pulse 2s ease-in-out infinite;
         }
 
         .result-actions {
@@ -328,116 +607,208 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
 
         .result-actions button {
             padding: 8px 15px;
-            border: 2px solid #e0e0e0;
+            border: 2px solid var(--gray-200);
             background: white;
-            border-radius: 10px;
+            border-radius: 12px;
+            font-weight: 600;
             cursor: pointer;
+            transition: all 0.3s;
             display: flex;
             align-items: center;
             gap: 5px;
+            color: var(--gray-700);
         }
 
         .result-actions button:hover {
-            border-color: #667eea;
-            color: #667eea;
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-2px);
         }
 
         .result-content {
             background: white;
-            border-radius: 10px;
+            border-radius: 15px;
             padding: 20px;
             font-family: 'Courier New', monospace;
             font-size: 14px;
-            line-height: 1.6;
-            max-height: 400px;
+            line-height: 1.8;
+            max-height: 500px;
             overflow-y: auto;
             white-space: pre-wrap;
             word-wrap: break-word;
+            border: 1px solid var(--gray-200);
         }
 
         .result-content.small {
-            background: #f0f9ff;
-            border-left: 5px solid #667eea;
+            background: linear-gradient(135deg, #f0f9ff, #e6f0fa);
+            border-left: 5px solid var(--primary);
+            font-weight: 500;
         }
 
-        .recent {
+        /* Recent Queries */
+        .recent-section {
             background: white;
-            border-radius: 20px;
+            border-radius: 30px;
             padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            animation: slideIn 0.9s ease;
         }
 
-        .recent h2 {
+        .recent-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .recent-header h2 {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--gray-800);
             display: flex;
             align-items: center;
             gap: 10px;
-            margin-bottom: 20px;
-            color: #2c3e50;
         }
 
-        .recent-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 15px;
+        .recent-header h2 i {
+            color: var(--primary);
+            animation: pulse 2s ease-in-out infinite;
         }
 
-        .recent-item {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 15px;
+        .clear-recent {
+            padding: 10px 20px;
+            background: var(--gray-100);
+            border: none;
+            border-radius: 15px;
+            color: var(--gray-600);
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
         }
 
+        .clear-recent:hover {
+            background: #fee2e2;
+            color: var(--danger);
+            transform: translateY(-2px);
+        }
+
+        .recent-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+        }
+
+        .recent-item {
+            background: var(--gray-50);
+            border-radius: 15px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+            animation: fadeInUp 0.5s ease;
+        }
+
         .recent-item:hover {
-            background: #edf2f7;
+            border-color: var(--primary);
             transform: translateX(5px);
+            background: white;
+            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.1);
         }
 
         .recent-type {
-            background: #667eea;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
-            padding: 3px 10px;
+            padding: 4px 12px;
             border-radius: 20px;
             font-size: 11px;
+            font-weight: 700;
             display: inline-block;
             margin-bottom: 8px;
         }
 
         .recent-param {
-            font-weight: 600;
-            color: #2c3e50;
+            font-weight: 700;
+            color: var(--gray-800);
             margin-bottom: 5px;
+            font-size: 14px;
         }
 
         .recent-time {
             font-size: 11px;
-            color: #7f8c8d;
+            color: var(--gray-500);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .dashboard {
+                padding: 15px;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .input-group {
+                flex-direction: column;
+            }
+            
+            .category-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .recent-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--gray-100);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
         }
     </style>
 </head>
 <body>
     <?php if (!$giris_yapildi): ?>
     <!-- LOGIN -->
-    <div class="login-container">
-        <div class="login-box">
-            <div class="logo">
+    <div class="login-wrapper">
+        <div class="login-card">
+            <div class="login-logo">
                 <i class="fas fa-shield-hal"></i>
                 <h1>DASSY TAG</h1>
-                <p>Profesyonel Sorgu Paneli</p>
+                <p style="color: var(--gray-500);">Profesyonel Sorgu Sistemi</p>
             </div>
             
             <?php if (isset($hata)): ?>
-                <div class="error">
-                    <i class="fas fa-exclamation-circle"></i> <?= $hata ?>
+                <div class="login-error">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <?= $hata ?>
                 </div>
             <?php endif; ?>
             
             <form method="POST">
-                <div class="input-group">
-                    <input type="password" name="password" placeholder="Şifre" required>
+                <div class="login-input-group">
+                    <input type="password" name="password" placeholder="Şifre" required autofocus>
                 </div>
-                <button type="submit" name="login" class="login-btn">GİRİŞ YAP</button>
+                <button type="submit" name="login" class="login-btn">
+                    <i class="fas fa-sign-in-alt"></i>
+                    GİRİŞ YAP
+                </button>
             </form>
         </div>
     </div>
@@ -448,46 +819,101 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
         <div class="header">
             <h1>
                 <i class="fas fa-shield-hal"></i>
-                DASSY TAG Sorgu Paneli
+                DASSY TAG
             </h1>
-            <a href="?logout=1" class="logout-btn">
-                <i class="fas fa-sign-out-alt"></i> Çıkış
-            </a>
+            <div class="user-badge">
+                <div class="status">
+                    <i class="fas fa-circle"></i>
+                    <span>PREMIUM</span>
+                </div>
+                <a href="?logout=1" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Çıkış
+                </a>
+            </div>
         </div>
         
-        <!-- Hızlı Butonlar -->
-        <div class="quick-actions">
-            <button class="quick-btn" onclick="setType('tc')">
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-database"></i>
+                </div>
+                <div class="stat-value">19</div>
+                <div class="stat-label">API Sayısı</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <div class="stat-value">PRO</div>
+                <div class="stat-label">Profesyonel</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-infinity"></i>
+                </div>
+                <div class="stat-value">∞</div>
+                <div class="stat-label">Sınırsız</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-shield"></i>
+                </div>
+                <div class="stat-value">SSL</div>
+                <div class="stat-label">Güvenli</div>
+            </div>
+        </div>
+        
+        <!-- Categories -->
+        <div class="category-grid">
+            <button class="category-btn active" onclick="setCategory('tc')">
                 <i class="fas fa-id-card"></i>
-                <span>TC</span>
+                <span>TC Kimlik</span>
             </button>
-            <button class="quick-btn" onclick="setType('gsm')">
+            <button class="category-btn" onclick="setCategory('gsm')">
                 <i class="fas fa-mobile-alt"></i>
                 <span>GSM</span>
             </button>
-            <button class="quick-btn" onclick="setType('ad')">
+            <button class="category-btn" onclick="setCategory('isim')">
                 <i class="fas fa-user"></i>
-                <span>Ad-Soyad</span>
+                <span>İsim</span>
             </button>
-            <button class="quick-btn" onclick="setType('aile')">
+            <button class="category-btn" onclick="setCategory('aile')">
                 <i class="fas fa-users"></i>
                 <span>Aile</span>
             </button>
-            <button class="quick-btn" onclick="setType('plaka')">
-                <i class="fas fa-car"></i>
-                <span>Plaka</span>
+            <button class="category-btn" onclick="setCategory('adres')">
+                <i class="fas fa-map-marker-alt"></i>
+                <span>Adres</span>
+            </button>
+            <button class="category-btn" onclick="setCategory('is')">
+                <i class="fas fa-briefcase"></i>
+                <span>İş</span>
+            </button>
+            <button class="category-btn" onclick="setCategory('finans')">
+                <i class="fas fa-coins"></i>
+                <span>Finans</span>
+            </button>
+            <button class="category-btn" onclick="setCategory('sosyal')">
+                <i class="fas fa-globe"></i>
+                <span>Sosyal</span>
+            </button>
+            <button class="category-btn" onclick="setCategory('egitim')">
+                <i class="fas fa-graduation-cap"></i>
+                <span>Eğitim</span>
             </button>
         </div>
         
-        <!-- Sorgu Kutusu -->
-        <div class="query-box">
-            <div class="query-type">
-                <i class="fas fa-id-card" id="typeIcon"></i>
-                <h2 id="typeTitle">TC Sorgulama</h2>
-                <span id="typeBadge">tc</span>
+        <!-- Query Section -->
+        <div class="query-section">
+            <div class="query-header">
+                <i class="fas fa-id-card" id="queryIcon"></i>
+                <h2 id="queryTitle">TC Sorgulama</h2>
+                <div class="badge" id="queryBadge">tc</div>
             </div>
             
-            <div class="input-area">
+            <div class="input-group">
                 <input type="text" id="queryParam" placeholder="Parametre girin..." onkeypress="if(event.key==='Enter') executeQuery()">
                 <button onclick="executeQuery()" id="queryBtn">
                     <i class="fas fa-search"></i>
@@ -495,18 +921,19 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
                 </button>
             </div>
             
-            <div class="example" id="queryExample">
-                <i class="fas fa-info-circle"></i> Örnek: 12345678901
+            <div class="query-example" id="queryExample">
+                <i class="fas fa-info-circle"></i>
+                Örnek: 12345678901
             </div>
             
             <!-- Loader -->
-            <div class="loader" id="queryLoader">
+            <div class="query-loader" id="queryLoader">
                 <div class="spinner"></div>
                 <p>Sorgulanıyor... (max 30 saniye)</p>
             </div>
             
-            <!-- Sonuç -->
-            <div class="result" id="resultContainer">
+            <!-- Result -->
+            <div class="result-container" id="resultContainer">
                 <div class="result-header">
                     <h3>
                         <i class="fas fa-check-circle"></i>
@@ -525,126 +952,253 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
             </div>
         </div>
         
-        <!-- Son Sorgular -->
-        <div class="recent">
-            <h2>
-                <i class="fas fa-history"></i>
-                Son Sorgular
-            </h2>
-            <div class="recent-grid" id="recentGrid">
-                <!-- JS ile doldurulacak -->
+        <!-- Recent Queries -->
+        <div class="recent-section">
+            <div class="recent-header">
+                <h2>
+                    <i class="fas fa-history"></i>
+                    Son Sorgular
+                </h2>
+                <button class="clear-recent" onclick="clearRecent()">
+                    <i class="fas fa-trash"></i>
+                    Temizle
+                </button>
             </div>
+            <div class="recent-grid" id="recentGrid"></div>
         </div>
     </div>
     
     <script>
+        // =============================================
+        // DASSY TAG - PROFESYONEL JAVASCRIPT
+        // Şifre: @ngbwayfite
+        // =============================================
+        
         // API Base URL
-        const API_BASE = 'https://botapi-jjwj.onrender.com';
+        const API_BASE = 'https://punisher.alwaysdata.net/apiservices/';
         
         // State
         let currentType = 'tc';
+        let currentCategory = 'tc';
         let recentQueries = JSON.parse(localStorage.getItem('recentQueries')) || [];
         
-        // Query types
-        const types = {
+        // API Listesi (19 API)
+        const apiList = {
+            // TC Kimlik
             'tc': {
                 name: 'TC Sorgulama',
                 icon: 'fa-id-card',
                 example: '12345678901',
                 badge: 'tc',
-                url: (p) => `${API_BASE}/tc?tc=${p}&format=json`
+                category: 'tc',
+                url: (p) => `${API_BASE}tc.php?tc=${p}`
             },
-            'tc2': {
-                name: 'TC Detaylı',
+            'tcpro': {
+                name: 'TC Profesyonel',
                 icon: 'fa-id-card',
                 example: '12345678901',
-                badge: 'tc2',
-                url: (p) => `${API_BASE}/tc2?tc=${p}&format=json`
+                badge: 'tcpro',
+                category: 'tc',
+                url: (p) => `${API_BASE}tcpro.php?tc=${p}`
             },
-            'gsm': {
-                name: 'GSM Sorgulama',
-                icon: 'fa-mobile-alt',
-                example: '5346149118',
-                badge: 'gsm',
-                url: (p) => `${API_BASE}/gsm?gsm=${p}&format=json`
-            },
-            'gsm2': {
-                name: 'GSM Detaylı',
-                icon: 'fa-mobile-alt',
-                example: '5346149118',
-                badge: 'gsm2',
-                url: (p) => `${API_BASE}/gsm2?gsm=${p}&format=json`
-            },
-            'ad': {
-                name: 'Ad-Soyad',
+            
+            // İsim
+            'adsoyad': {
+                name: 'İsim-Soyisim',
                 icon: 'fa-user',
-                example: 'EYMEN YAVUZ',
-                badge: 'ad',
+                example: 'roket atar',
+                badge: 'adsoyad',
+                category: 'isim',
                 url: (p) => {
                     const parts = p.split(' ');
-                    return `${API_BASE}/ad?name=${parts[0]}&surname=${parts[1] || ''}&format=json`;
+                    return `${API_BASE}adsoyad.php?ad=${parts[0]}&soyad=${parts[1] || ''}`;
                 }
             },
+            'adsoyadpro': {
+                name: 'İsim-Soyisim-İl',
+                icon: 'fa-user',
+                example: 'roket atar bursa',
+                badge: 'adsoyadpro',
+                category: 'isim',
+                url: (p) => {
+                    const parts = p.split(' ');
+                    return `${API_BASE}adsoyadpro.php?ad=${parts[0]}&soyad=${parts[1] || ''}&il=${parts[2] || ''}`;
+                }
+            },
+            'adililce': {
+                name: 'İsim-İl',
+                icon: 'fa-user',
+                example: 'roket bursa',
+                badge: 'adililce',
+                category: 'isim',
+                url: (p) => {
+                    const parts = p.split(' ');
+                    return `${API_BASE}adililce.php?ad=${parts[0]}&il=${parts[1] || ''}`;
+                }
+            },
+            
+            // Aile
             'aile': {
                 name: 'Aile Sorgulama',
                 icon: 'fa-users',
                 example: '12345678901',
                 badge: 'aile',
-                url: (p) => `${API_BASE}/aile?tc=${p}&format=json`
+                category: 'aile',
+                url: (p) => `${API_BASE}aile.php?tc=${p}`
+            },
+            'ailepro': {
+                name: 'Aile Profesyonel',
+                icon: 'fa-users',
+                example: '12345678901',
+                badge: 'ailepro',
+                category: 'aile',
+                url: (p) => `${API_BASE}ailepro.php?tc=${p}`
             },
             'sulale': {
                 name: 'Sülale Sorgulama',
                 icon: 'fa-tree',
                 example: '12345678901',
                 badge: 'sulale',
-                url: (p) => `${API_BASE}/sulale?tc=${p}&format=json`
+                category: 'aile',
+                url: (p) => `${API_BASE}sulale.php?tc=${p}`
             },
-            'hane': {
-                name: 'Hane Sorgulama',
-                icon: 'fa-home',
+            'soyagaci': {
+                name: 'Soy Ağacı',
+                icon: 'fa-tree',
                 example: '12345678901',
-                badge: 'hane',
-                url: (p) => `${API_BASE}/hane?tc=${p}&format=json`
+                badge: 'soyagaci',
+                category: 'aile',
+                url: (p) => `${API_BASE}soyagaci.php?tc=${p}`
             },
+            
+            // Adres
+            'adres': {
+                name: 'Adres Sorgulama',
+                icon: 'fa-map-marker-alt',
+                example: '12345678901',
+                badge: 'adres',
+                category: 'adres',
+                url: (p) => `${API_BASE}adres.php?tc=${p}`
+            },
+            'adrespro': {
+                name: 'Adres Profesyonel',
+                icon: 'fa-map-marker-alt',
+                example: '12345678901',
+                badge: 'adrespro',
+                category: 'adres',
+                url: (p) => `${API_BASE}adrespro.php?tc=${p}`
+            },
+            
+            // İş
             'isyeri': {
                 name: 'İş Yeri Sorgulama',
                 icon: 'fa-briefcase',
                 example: '12345678901',
                 badge: 'isyeri',
-                url: (p) => `${API_BASE}/isyeri?tc=${p}&format=json`
+                category: 'is',
+                url: (p) => `${API_BASE}isyeri.php?tc=${p}`
             },
-            'plaka': {
-                name: 'Plaka Sorgulama',
-                icon: 'fa-car',
-                example: '34AKP34',
-                badge: 'plaka',
-                url: (p) => `${API_BASE}/plaka?plaka=${p}&format=json`
-            },
-            'vesika': {
-                name: 'Vesika Sorgulama',
-                icon: 'fa-id-card',
+            'isyeriark': {
+                name: 'İş Arkadaşları',
+                icon: 'fa-users',
                 example: '12345678901',
-                badge: 'vesika',
-                url: (p) => `${API_BASE}/vesika?tc=${p}&format=json`
+                badge: 'isyeriark',
+                category: 'is',
+                url: (p) => `${API_BASE}isyeriark.php?tc=${p}`
             },
-            'tc-ikametgah': {
-                name: 'İkametgah Sorgulama',
-                icon: 'fa-map-marker-alt',
+            
+            // GSM
+            'gncloperator': {
+                name: 'Güncel Operatör',
+                icon: 'fa-mobile-alt',
+                example: '5415722525',
+                badge: 'gncloperator',
+                category: 'gsm',
+                url: (p) => `${API_BASE}gncloperator.php?numara=${p}`
+            },
+            'tcgsm': {
+                name: 'TC\'den GSM',
+                icon: 'fa-mobile-alt',
                 example: '12345678901',
-                badge: 'ikametgah',
-                url: (p) => `${API_BASE}/tc-ikametgah?tc=${p}&format=json`
+                badge: 'tcgsm',
+                category: 'gsm',
+                url: (p) => `${API_BASE}tcgsm.php?tc=${p}`
+            },
+            'gsmtc': {
+                name: 'GSM\'den TC',
+                icon: 'fa-mobile-alt',
+                example: '5415722525',
+                badge: 'gsmtc',
+                category: 'gsm',
+                url: (p) => `${API_BASE}gsmtc.php?gsm=${p}`
+            },
+            
+            // Finans
+            'iban': {
+                name: 'IBAN Sorgulama',
+                icon: 'fa-coins',
+                example: 'TR200006283386172945624672',
+                badge: 'iban',
+                category: 'finans',
+                url: (p) => `${API_BASE}iban.php?iban=${p}`
+            },
+            'sms': {
+                name: 'SMS Sorgulama',
+                icon: 'fa-comment',
+                example: '5415722525',
+                badge: 'sms',
+                category: 'finans',
+                url: (p) => `${API_BASE}sms.php?gsm=${p}`
+            },
+            
+            // Sosyal
+            'tg': {
+                name: 'Telegram Sorgulama',
+                icon: 'fa-telegram',
+                example: 'SanalMeclis',
+                badge: 'tg',
+                category: 'sosyal',
+                url: (p) => `${API_BASE}tg.php?username=${p.replace('@', '')}`
+            },
+            
+            // Eğitim
+            'okulno': {
+                name: 'Okul Numarası',
+                icon: 'fa-graduation-cap',
+                example: '12345678901',
+                badge: 'okulno',
+                category: 'egitim',
+                url: (p) => `${API_BASE}okulno.php?tc=${p}`
             }
         };
+        
+        // Set category
+        function setCategory(category) {
+            currentCategory = category;
+            
+            // Update active buttons
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+            
+            // Show first API in category
+            const firstApi = Object.values(apiList).find(api => api.category === category);
+            if (firstApi) {
+                setType(Object.keys(apiList).find(key => apiList[key] === firstApi));
+            }
+        }
         
         // Set query type
         function setType(type) {
             currentType = type;
-            const t = types[type];
+            const api = apiList[type];
             
-            document.getElementById('typeIcon').className = `fas ${t.icon}`;
-            document.getElementById('typeTitle').textContent = t.name;
-            document.getElementById('typeBadge').textContent = t.badge;
-            document.getElementById('queryExample').innerHTML = `<i class="fas fa-info-circle"></i> Örnek: ${t.example}`;
+            document.getElementById('queryIcon').className = `fas ${api.icon}`;
+            document.getElementById('queryTitle').textContent = api.name;
+            document.getElementById('queryBadge').textContent = api.badge;
+            document.getElementById('queryExample').innerHTML = `<i class="fas fa-info-circle"></i> Örnek: ${api.example}`;
+            document.getElementById('queryParam').placeholder = api.example;
         }
         
         // Execute query
@@ -652,19 +1206,19 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
             const param = document.getElementById('queryParam').value.trim();
             
             if (!param) {
-                alert('Parametre girin!');
+                alert('Lütfen parametre girin!');
                 return;
             }
             
-            const t = types[currentType];
-            const url = t.url(encodeURIComponent(param));
+            const api = apiList[currentType];
+            const url = api.url(param);
             
             // Show loader
             document.getElementById('queryLoader').style.display = 'block';
             document.getElementById('resultContainer').style.display = 'none';
             document.getElementById('queryBtn').disabled = true;
             
-            // Timeout 30 saniye
+            // Timeout 30 seconds
             const timeout = setTimeout(() => {
                 document.getElementById('queryLoader').style.display = 'none';
                 document.getElementById('queryBtn').disabled = false;
@@ -672,7 +1226,6 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
             }, 30000);
             
             try {
-                // API'ye direkt istek
                 const response = await fetch(url);
                 clearTimeout(timeout);
                 
@@ -686,9 +1239,23 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
                 document.getElementById('queryLoader').style.display = 'none';
                 document.getElementById('queryBtn').disabled = false;
                 
-                // Show result
+                // Format and show result
                 const resultContent = document.getElementById('resultContent');
-                const resultStr = JSON.stringify(data, null, 2);
+                let resultStr;
+                
+                // Eğer data varsa ve reklam varsa temizle
+                if (data && typeof data === 'object') {
+                    // Reklam alanlarını temizle
+                    delete data.geliştirici;
+                    delete data.sürüm;
+                    delete data.reklam;
+                    delete data.auth;
+                    delete data.api_sahibi;
+                    
+                    resultStr = JSON.stringify(data, null, 2);
+                } else {
+                    resultStr = JSON.stringify(data, null, 2);
+                }
                 
                 resultContent.textContent = resultStr;
                 
@@ -701,8 +1268,8 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
                 
                 document.getElementById('resultContainer').style.display = 'block';
                 
-                // Son sorgulara ekle
-                addToRecent(currentType, param, data);
+                // Add to recent
+                addToRecent(api.name, param, data);
                 
             } catch (error) {
                 clearTimeout(timeout);
@@ -716,7 +1283,7 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
         function copyResult() {
             const content = document.getElementById('resultContent').textContent;
             navigator.clipboard.writeText(content).then(() => {
-                alert('Kopyalandı!');
+                alert('Sonuç kopyalandı!');
             });
         }
         
@@ -735,10 +1302,10 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
         // Add to recent
         function addToRecent(type, param, data) {
             const query = {
-                type: types[type].name,
+                type: type,
                 param: param,
                 time: new Date().toLocaleString('tr-TR'),
-                data: data
+                preview: JSON.stringify(data).substring(0, 50) + '...'
             };
             
             recentQueries.unshift(query);
@@ -753,12 +1320,12 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
             const grid = document.getElementById('recentGrid');
             
             if (recentQueries.length === 0) {
-                grid.innerHTML = '<p style="text-align: center; color: #999;">Henüz sorgu yok</p>';
+                grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--gray-400); padding: 40px;">Henüz sorgu yapılmadı</p>';
                 return;
             }
             
             grid.innerHTML = recentQueries.map(q => `
-                <div class="recent-item" onclick='showRecent(${JSON.stringify(q.data)})'>
+                <div class="recent-item" onclick='showRecent(${JSON.stringify(q)})'>
                     <span class="recent-type">${q.type}</span>
                     <div class="recent-param">${q.param}</div>
                     <div class="recent-time">${q.time}</div>
@@ -767,15 +1334,14 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
         }
         
         // Show recent
-        function showRecent(data) {
-            const resultContent = document.getElementById('resultContent');
-            resultContent.textContent = JSON.stringify(data, null, 2);
+        function showRecent(query) {
+            document.getElementById('resultContent').textContent = JSON.stringify(query, null, 2);
             document.getElementById('resultContainer').style.display = 'block';
         }
         
         // Clear recent
         function clearRecent() {
-            if (confirm('Son sorgular silinsin mi?')) {
+            if (confirm('Tüm son sorgular silinsin mi?')) {
                 recentQueries = [];
                 localStorage.removeItem('recentQueries');
                 loadRecent();
@@ -786,6 +1352,15 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
         document.addEventListener('DOMContentLoaded', () => {
             setType('tc');
             loadRecent();
+            
+            // Add animation to cards
+            document.querySelectorAll('.stat-card').forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+            });
+            
+            document.querySelectorAll('.category-btn').forEach((btn, index) => {
+                btn.style.animationDelay = `${index * 0.05}s`;
+            });
         });
     </script>
     <?php endif; ?>
