@@ -2,80 +2,338 @@
 session_start();
 
 // =============================================
-// NGB SORGU PANELİM.IO - JOKER ULTIMATE PANEL
-// OPTİMİZE EDİLMİŞ - AKICI ANİMASYONLAR
-// Şifre: @ngbwayfite
+// NGB SORGU PANELİ - ÇOK KULLANICILI SİSTEM
+// HER KULLANICI KENDİ PANELİNİ KULLANIR
+// Şifre: @ngbsorguata44 (Admin)
 // =============================================
 
-define('SIFRE', '@ngbwayfite');
 define('BOT_TOKEN', '8588404115:AAG7BD9FebTCIy-3VR7h4byCidwDcrIZXWw');
 define('CHAT_ID', '8444268448');
 
+// Veritabanı bağlantısı
+try {
+    $db = new PDO('sqlite:users.db');
+    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    
+    // Kullanıcılar tablosu
+    $db->exec("CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT UNIQUE,
+        password TEXT,
+        email TEXT,
+        fullname TEXT,
+        role TEXT DEFAULT 'user',
+        status TEXT DEFAULT 'active',
+        created_at DATETIME,
+        last_login DATETIME,
+        last_ip TEXT,
+        total_queries INTEGER DEFAULT 0,
+        api_calls INTEGER DEFAULT 0,
+        notes TEXT,
+        banned_until DATETIME,
+        ban_reason TEXT
+    )");
+    
+    // Sorgu logları tablosu
+    $db->exec("CREATE TABLE IF NOT EXISTS query_logs (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        username TEXT,
+        query_type TEXT,
+        query_param TEXT,
+        result TEXT,
+        ip TEXT,
+        created_at DATETIME,
+        status TEXT
+    )");
+    
+    // API anahtarları tablosu
+    $db->exec("CREATE TABLE IF NOT EXISTS api_keys (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        api_key TEXT UNIQUE,
+        created_at DATETIME,
+        last_used DATETIME,
+        expires_at DATETIME,
+        is_active BOOLEAN DEFAULT 1
+    )");
+    
+    // İşlem logları
+    $db->exec("CREATE TABLE IF NOT EXISTS activity_logs (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        username TEXT,
+        action TEXT,
+        details TEXT,
+        ip TEXT,
+        created_at DATETIME
+    )");
+    
+    // Admin ayarları
+    $db->exec("CREATE TABLE IF NOT EXISTS settings (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        setting_key TEXT UNIQUE,
+        setting_value TEXT,
+        updated_at DATETIME
+    )");
+    
+    // Varsayılan admin kullanıcısı
+    $stmt = $db->prepare("SELECT COUNT(*) FROM users WHERE role = 'admin'");
+    $stmt->execute();
+    if ($stmt->fetchColumn() == 0) {
+        $admin_pass = password_hash('@ngbsorguata44', PASSWORD_DEFAULT);
+        $stmt = $db->prepare("INSERT INTO users (username, password, fullname, role, created_at) VALUES (?, ?, ?, 'admin', datetime('now'))");
+        $stmt->execute(['admin', $admin_pass, 'Admin User']);
+    }
+    
+} catch(PDOException $e) {
+    die("Veritabanı hatası: " . $e->getMessage());
+}
+
+// Telegram log gönderme fonksiyonu
+function sendTelegramLog($message) {
+    @file_get_contents("https://api.telegram.org/bot" . BOT_TOKEN . "/sendMessage?chat_id=" . CHAT_ID . "&text=" . urlencode($message) . "&parse_mode=Markdown");
+}
+
+// Aktivite loglama
+function logActivity($user_id, $username, $action, $details = '') {
+    global $db;
+    $ip = $_SERVER['REMOTE_ADDR'];
+    $stmt = $db->prepare("INSERT INTO activity_logs (user_id, username, action, details, ip, created_at) VALUES (?, ?, ?, ?, ?, datetime('now'))");
+    $stmt->execute([$user_id, $username, $action, $details, $ip]);
+}
+
+// Login işlemi
+if (isset($_POST['login'])) {
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+    $ip = $_SERVER['REMOTE_ADDR'];
+    
+    $stmt = $db->prepare("SELECT * FROM users WHERE username = ? AND status = 'active'");
+    $stmt->execute([$username]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if ($user && password_verify($password, $user['password'])) {
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['username'] = $user['username'];
+        $_SESSION['role'] = $user['role'];
+        
+        // Son giriş bilgilerini güncelle
+        $stmt = $db->prepare("UPDATE users SET last_login = datetime('now'), last_ip = ? WHERE id = ?");
+        $stmt->execute([$ip, $user['id']]);
+        
+        logActivity($user['id'], $user['username'], 'GİRİŞ', "Başarılı giriş");
+        
+        $mesaj = "🔐 *YENİ GİRİŞ*\n\n";
+        $mesaj .= "👤 *Kullanıcı:* {$user['username']}\n";
+        $mesaj .= "🌐 *IP:* `$ip`\n";
+        $mesaj .= "🕒 *Tarih:* " . date('Y-m-d H:i:s');
+        sendTelegramLog($mesaj);
+        
+        header('Location: index.php');
+        exit;
+    } else {
+        $hata = "Hatalı kullanıcı adı veya şifre!";
+        
+        $mesaj = "⚠️ *BAŞARISIZ GİRİŞ DENEMESİ*\n\n";
+        $mesaj .= "👤 *Kullanıcı:* $username\n";
+        $mesaj .= "🌐 *IP:* `$ip`\n";
+        $mesaj .= "🕒 *Tarih:* " . date('Y-m-d H:i:s');
+        sendTelegramLog($mesaj);
+    }
+}
+
+// Register işlemi
+if (isset($_POST['register'])) {
+    $username = $_POST['username'];
+    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+    $email = $_POST['email'];
+    $fullname = $_POST['fullname'];
+    $ip = $_SERVER['REMOTE_ADDR'];
+    
+    // Kullanıcı adı kontrolü
+    $stmt = $db->prepare("SELECT COUNT(*) FROM users WHERE username = ?");
+    $stmt->execute([$username]);
+    if ($stmt->fetchColumn() > 0) {
+        $kayit_hata = "Bu kullanıcı adı zaten kullanılıyor!";
+    } else {
+        $stmt = $db->prepare("INSERT INTO users (username, password, email, fullname, role, created_at, last_ip) VALUES (?, ?, ?, ?, 'user', datetime('now'), ?)");
+        $stmt->execute([$username, $password, $email, $fullname, $ip]);
+        
+        logActivity($db->lastInsertId(), $username, 'KAYIT', "Yeni kullanıcı kaydı");
+        
+        $mesaj = "✅ *YENİ KULLANICI KAYDI*\n\n";
+        $mesaj .= "👤 *Kullanıcı:* $username\n";
+        $mesaj .= "📧 *Email:* $email\n";
+        $mesaj .= "👤 *İsim:* $fullname\n";
+        $mesaj .= "🌐 *IP:* `$ip`\n";
+        $mesaj .= "🕒 *Tarih:* " . date('Y-m-d H:i:s');
+        sendTelegramLog($mesaj);
+        
+        $kayit_basarili = "Kayıt başarılı! Giriş yapabilirsiniz.";
+    }
+}
+
 // Logout
 if (isset($_GET['logout'])) {
+    if (isset($_SESSION['user_id'])) {
+        logActivity($_SESSION['user_id'], $_SESSION['username'], 'ÇIKIŞ', 'Kullanıcı çıkış yaptı');
+    }
     session_destroy();
     header('Location: index.php');
     exit;
 }
 
-// Login
-if (isset($_POST['login'])) {
-    if ($_POST['password'] === SIFRE) {
-        $_SESSION['loggedin'] = true;
-        
-        $ip = $_SERVER['REMOTE_ADDR'];
-        $user_agent = $_SERVER['HTTP_USER_AGENT'];
-        $tarih = date('Y-m-d H:i:s');
-        
-        $mesaj = "🔐 *YENİ GİRİŞ*\n\n";
-        $mesaj .= "👤 *Kullanıcı:* Panel Admin\n";
-        $mesaj .= "🌐 *IP:* `$ip`\n";
-        $mesaj .= "📱 *Cihaz:* $user_agent\n";
-        $mesaj .= "🕒 *Tarih:* $tarih\n";
-        
-        @file_get_contents("https://api.telegram.org/bot" . BOT_TOKEN . "/sendMessage?chat_id=" . CHAT_ID . "&text=" . urlencode($mesaj) . "&parse_mode=Markdown");
-    } else {
-        $hata = "Hatalı şifre!";
-        
-        $ip = $_SERVER['REMOTE_ADDR'];
-        $tarih = date('Y-m-d H:i:s');
-        
-        $mesaj = "⚠️ *BAŞARISIZ GİRİŞ DENEMESİ*\n\n";
-        $mesaj .= "🌐 *IP:* `$ip`\n";
-        $mesaj .= "🕒 *Tarih:* $tarih\n";
-        
-        @file_get_contents("https://api.telegram.org/bot" . BOT_TOKEN . "/sendMessage?chat_id=" . CHAT_ID . "&text=" . urlencode($mesaj) . "&parse_mode=Markdown");
+// Kullanıcı bilgilerini al
+$kullanici = null;
+if (isset($_SESSION['user_id'])) {
+    $stmt = $db->prepare("SELECT * FROM users WHERE id = ?");
+    $stmt->execute([$_SESSION['user_id']]);
+    $kullanici = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    // Ban kontrolü
+    if ($kullanici['status'] == 'banned') {
+        if ($kullanici['banned_until'] && strtotime($kullanici['banned_until']) > time()) {
+            session_destroy();
+            $ban_hata = "Hesabınız " . $kullanici['banned_until'] . " tarihine kadar banlanmıştır. Sebep: " . $kullanici['ban_reason'];
+        } elseif (!$kullanici['banned_until']) {
+            session_destroy();
+            $ban_hata = "Hesabınız kalıcı olarak banlanmıştır. Sebep: " . $kullanici['ban_reason'];
+        }
     }
 }
 
+// Admin kontrolü
+$isAdmin = ($kullanici && $kullanici['role'] == 'admin');
+
 // Sorgu kaydı
-if (isset($_POST['sorgu_kaydet']) && isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
+if (isset($_POST['sorgu_kaydet']) && $kullanici) {
     $sorgu_tipi = $_POST['sorgu_tipi'];
     $sorgu_parametre = $_POST['sorgu_parametre'];
     $sonuc = $_POST['sonuc'];
     $ip = $_SERVER['REMOTE_ADDR'];
-    $tarih = date('Y-m-d H:i:s');
+    
+    $stmt = $db->prepare("INSERT INTO query_logs (user_id, username, query_type, query_param, result, ip, created_at, status) VALUES (?, ?, ?, ?, ?, ?, datetime('now'), 'success')");
+    $stmt->execute([$kullanici['id'], $kullanici['username'], $sorgu_tipi, $sorgu_parametre, $sonuc, $ip]);
+    
+    $stmt = $db->prepare("UPDATE users SET total_queries = total_queries + 1, api_calls = api_calls + 1 WHERE id = ?");
+    $stmt->execute([$kullanici['id']]);
+    
+    logActivity($kullanici['id'], $kullanici['username'], 'SORGU', "$sorgu_tipi: $sorgu_parametre");
     
     $mesaj = "🔍 *YENİ SORGU*\n\n";
+    $mesaj .= "👤 *Kullanıcı:* {$kullanici['username']}\n";
     $mesaj .= "📌 *Tip:* $sorgu_tipi\n";
     $mesaj .= "🔎 *Parametre:* `$sorgu_parametre`\n";
     $mesaj .= "🌐 *IP:* `$ip`\n";
-    $mesaj .= "🕒 *Tarih:* $tarih\n";
-    
-    @file_get_contents("https://api.telegram.org/bot" . BOT_TOKEN . "/sendMessage?chat_id=" . CHAT_ID . "&text=" . urlencode($mesaj) . "&parse_mode=Markdown");
+    $mesaj .= "🕒 *Tarih:* " . date('Y-m-d H:i:s');
+    sendTelegramLog($mesaj);
     
     echo json_encode(['success' => true]);
     exit;
 }
 
-$giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
+// Admin işlemleri
+if ($isAdmin && isset($_POST['admin_action'])) {
+    $action = $_POST['admin_action'];
+    
+    if ($action == 'ban_user') {
+        $user_id = $_POST['user_id'];
+        $reason = $_POST['reason'];
+        $duration = $_POST['duration']; // days or 'permanent'
+        
+        if ($duration == 'permanent') {
+            $stmt = $db->prepare("UPDATE users SET status = 'banned', ban_reason = ?, banned_until = NULL WHERE id = ?");
+        } else {
+            $until = date('Y-m-d H:i:s', strtotime("+$duration days"));
+            $stmt = $db->prepare("UPDATE users SET status = 'banned', ban_reason = ?, banned_until = ? WHERE id = ?");
+            $stmt->execute([$reason, $until, $user_id]);
+        }
+        
+        logActivity($_SESSION['user_id'], $_SESSION['username'], 'ADMIN_BAN', "Kullanıcı $user_id banlandı: $reason");
+        
+        echo json_encode(['success' => true]);
+        exit;
+    }
+    
+    if ($action == 'unban_user') {
+        $user_id = $_POST['user_id'];
+        $stmt = $db->prepare("UPDATE users SET status = 'active', ban_reason = NULL, banned_until = NULL WHERE id = ?");
+        $stmt->execute([$user_id]);
+        
+        logActivity($_SESSION['user_id'], $_SESSION['username'], 'ADMIN_UNBAN', "Kullanıcı $user_id banı kaldırıldı");
+        
+        echo json_encode(['success' => true]);
+        exit;
+    }
+    
+    if ($action == 'change_role') {
+        $user_id = $_POST['user_id'];
+        $role = $_POST['role'];
+        $stmt = $db->prepare("UPDATE users SET role = ? WHERE id = ?");
+        $stmt->execute([$role, $user_id]);
+        
+        logActivity($_SESSION['user_id'], $_SESSION['username'], 'ADMIN_ROLE', "Kullanıcı $user_id rolü: $role");
+        
+        echo json_encode(['success' => true]);
+        exit;
+    }
+    
+    if ($action == 'add_note') {
+        $user_id = $_POST['user_id'];
+        $note = $_POST['note'];
+        $stmt = $db->prepare("UPDATE users SET notes = ? WHERE id = ?");
+        $stmt->execute([$note, $user_id]);
+        
+        logActivity($_SESSION['user_id'], $_SESSION['username'], 'ADMIN_NOTE', "Kullanıcı $user_id not: $note");
+        
+        echo json_encode(['success' => true]);
+        exit;
+    }
+    
+    if ($action == 'delete_user') {
+        $user_id = $_POST['user_id'];
+        $stmt = $db->prepare("DELETE FROM users WHERE id = ? AND role != 'admin'");
+        $stmt->execute([$user_id]);
+        
+        logActivity($_SESSION['user_id'], $_SESSION['username'], 'ADMIN_DELETE', "Kullanıcı $user_id silindi");
+        
+        echo json_encode(['success' => true]);
+        exit;
+    }
+    
+    if ($action == 'clear_logs') {
+        $days = $_POST['days'];
+        $stmt = $db->prepare("DELETE FROM query_logs WHERE created_at < datetime('now', '-' || ? || ' days')");
+        $stmt->execute([$days]);
+        
+        logActivity($_SESSION['user_id'], $_SESSION['username'], 'ADMIN_CLEAR_LOGS', "$days gün öncesi loglar temizlendi");
+        
+        echo json_encode(['success' => true, 'deleted' => $stmt->rowCount()]);
+        exit;
+    }
+    
+    if ($action == 'generate_api_key') {
+        $user_id = $_POST['user_id'];
+        $api_key = bin2hex(random_bytes(32));
+        $expires = date('Y-m-d H:i:s', strtotime('+30 days'));
+        
+        $stmt = $db->prepare("INSERT INTO api_keys (user_id, api_key, created_at, expires_at) VALUES (?, ?, datetime('now'), ?)");
+        $stmt->execute([$user_id, $api_key, $expires]);
+        
+        logActivity($_SESSION['user_id'], $_SESSION['username'], 'ADMIN_API_KEY', "Kullanıcı $user_id için API anahtarı oluşturuldu");
+        
+        echo json_encode(['success' => true, 'api_key' => $api_key]);
+        exit;
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NGB SORGU PANELİ | JOKER ULTIMATE</title>
+    <title>NGB SORGU PANELİ | ÇOK KULLANICILI SİSTEM</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -86,269 +344,88 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
         }
 
         :root {
-            --joker-purple: #8b5cf6;
-            --joker-dark: #2e1065;
-            --joker-darker: #1a0b2e;
-            --joker-light: #c4b5fd;
-            --joker-glow: #a78bfa;
-            --joker-green: #10b981;
-            --joker-red: #ef4444;
-            --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-medium: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            --primary: #8b5cf6;
+            --primary-dark: #2e1065;
+            --primary-darker: #1a0b2e;
+            --primary-light: #c4b5fd;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
         }
 
         body {
             font-family: 'Orbitron', sans-serif;
-            background: linear-gradient(135deg, #000000, var(--joker-darker), var(--joker-dark));
+            background: linear-gradient(135deg, #000000, var(--primary-darker), var(--primary-dark));
             min-height: 100vh;
-            overflow-x: hidden;
             position: relative;
         }
 
-        /* Optimized Background Effects */
-        .bg-gradient {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 20% 50%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
-                        radial-gradient(circle at 80% 80%, rgba(196, 181, 253, 0.1) 0%, transparent 50%);
-            pointer-events: none;
-            z-index: 0;
-            animation: bgShift 20s ease-in-out infinite alternate;
+        /* Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
         }
 
-        @keyframes bgShift {
-            0% { transform: scale(1); opacity: 0.5; }
-            100% { transform: scale(1.2); opacity: 1; }
+        @keyframes glow {
+            0%, 100% { filter: drop-shadow(0 0 5px var(--primary)); }
+            50% { filter: drop-shadow(0 0 25px var(--primary-light)); }
         }
 
-        /* Floating Cards - Optimized */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        /* Floating Cards */
         .floating-card {
             position: fixed;
-            font-size: 60px;
-            color: var(--joker-purple);
+            font-size: 50px;
+            color: var(--primary);
             opacity: 0.05;
             pointer-events: none;
             z-index: 0;
-            animation: float 25s ease-in-out infinite;
-            transform: translateZ(0);
-            will-change: transform;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
-            33% { transform: translateY(-50px) rotate(5deg) scale(1.1); }
-            66% { transform: translateY(-30px) rotate(-5deg) scale(0.95); }
+            animation: float 20s ease-in-out infinite;
         }
 
         .card1 { top: 10%; left: 5%; animation-delay: 0s; }
         .card2 { top: 20%; right: 10%; animation-delay: 5s; }
         .card3 { bottom: 15%; left: 15%; animation-delay: 10s; }
         .card4 { bottom: 25%; right: 20%; animation-delay: 15s; }
-        .card5 { top: 50%; left: 50%; animation-delay: 20s; }
 
-        /* Particles - Optimized with transform3d */
+        /* Particles */
         .particle {
             position: fixed;
             width: 2px;
             height: 2px;
-            background: var(--joker-light);
+            background: var(--primary-light);
             border-radius: 50%;
             pointer-events: none;
             z-index: 0;
             opacity: 0.2;
-            animation: particle 20s linear infinite;
-            transform: translate3d(0, 0, 0);
-            will-change: transform;
+            animation: particle 15s linear infinite;
         }
 
         @keyframes particle {
-            0% { transform: translate3d(0, 100vh, 0) scale(1); opacity: 0; }
-            10% { opacity: 0.5; }
-            90% { opacity: 0.5; }
-            100% { transform: translate3d(100px, -100vh, 0) scale(0); opacity: 0; }
+            0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+            10% { opacity: 0.3; }
+            90% { opacity: 0.3; }
+            100% { transform: translateY(-100vh) translateX(100px); opacity: 0; }
         }
 
-        /* Glow Effect */
-        @keyframes glow {
-            0% { filter: drop-shadow(0 0 5px var(--joker-purple)); }
-            50% { filter: drop-shadow(0 0 25px var(--joker-light)); }
-            100% { filter: drop-shadow(0 0 5px var(--joker-purple)); }
-        }
-
-        /* Pulse Effect */
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.02); }
-            100% { transform: scale(1); }
-        }
-
-        /* Slide In */
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translate3d(0, 30px, 0);
-            }
-            to {
-                opacity: 1;
-                transform: translate3d(0, 0, 0);
-            }
-        }
-
-        /* Hamburger Menu - Optimized */
-        .menu-toggle {
-            position: fixed;
-            top: 30px;
-            left: 30px;
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, var(--joker-purple), var(--joker-light));
-            border-radius: 15px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            gap: 6px;
-            cursor: pointer;
-            z-index: 1000;
-            border: 2px solid rgba(255,255,255,0.3);
-            box-shadow: 0 0 30px var(--joker-glow);
-            transition: var(--transition-medium);
-            transform: translateZ(0);
-            will-change: transform;
-        }
-
-        .menu-toggle:hover {
-            transform: scale(1.1) rotate(5deg);
-        }
-
-        .menu-toggle span {
-            width: 25px;
-            height: 3px;
-            background: white;
-            border-radius: 3px;
-            transition: var(--transition-medium);
-            transform: translateZ(0);
-        }
-
-        .menu-toggle.active span:nth-child(1) {
-            transform: rotate(45deg) translate(6px, 6px);
-        }
-
-        .menu-toggle.active span:nth-child(2) {
-            opacity: 0;
-            transform: scale(0);
-        }
-
-        .menu-toggle.active span:nth-child(3) {
-            transform: rotate(-45deg) translate(6px, -6px);
-        }
-
-        /* Side Menu - Optimized */
-        .side-menu {
-            position: fixed;
-            top: 0;
-            left: -350px;
-            width: 320px;
-            height: 100vh;
-            background: rgba(26, 11, 46, 0.98);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            z-index: 999;
-            transition: left var(--transition-slow);
-            border-right: 2px solid var(--joker-purple);
-            box-shadow: 0 0 40px var(--joker-glow);
-            overflow-y: auto;
-            padding: 90px 20px 30px;
-            transform: translateZ(0);
-            will-change: left;
-        }
-
-        .side-menu.active {
-            left: 0;
-        }
-
-        .menu-header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid var(--joker-purple);
-            animation: slideIn 0.5s ease-out;
-        }
-
-        .menu-header i {
-            font-size: 50px;
-            color: var(--joker-light);
-            animation: pulse 3s ease-in-out infinite;
-        }
-
-        .menu-header h2 {
-            color: white;
-            font-size: 20px;
-            margin-top: 10px;
-        }
-
-        .menu-category {
-            margin-bottom: 25px;
-            animation: slideIn 0.5s ease-out;
-            animation-fill-mode: both;
-        }
-
-        .menu-category:nth-child(2) { animation-delay: 0.1s; }
-        .menu-category:nth-child(3) { animation-delay: 0.2s; }
-        .menu-category:nth-child(4) { animation-delay: 0.3s; }
-        .menu-category:nth-child(5) { animation-delay: 0.4s; }
-        .menu-category:nth-child(6) { animation-delay: 0.5s; }
-        .menu-category:nth-child(7) { animation-delay: 0.6s; }
-
-        .menu-category-title {
-            color: var(--joker-light);
-            font-size: 14px;
-            font-weight: 700;
-            margin-bottom: 12px;
-            padding-left: 10px;
-            border-left: 3px solid var(--joker-purple);
-            letter-spacing: 1px;
-        }
-
-        .menu-items {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-        }
-
-        .menu-item {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid var(--joker-purple);
-            border-radius: 12px;
-            padding: 10px 5px;
-            color: white;
-            text-align: center;
-            cursor: pointer;
-            transition: var(--transition-fast);
-            font-size: 11px;
-            font-weight: 600;
-            transform: translateZ(0);
-            will-change: transform;
-        }
-
-        .menu-item:hover {
-            background: linear-gradient(135deg, var(--joker-purple), var(--joker-light));
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 10px 20px rgba(139,92,246,0.3);
-        }
-
-        .menu-item i {
-            display: block;
-            font-size: 18px;
-            margin-bottom: 4px;
-        }
-
-        /* Login - Optimized */
-        .login-wrapper {
+        /* Login/Register Container */
+        .auth-container {
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -356,98 +433,140 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
             padding: 20px;
             position: relative;
             z-index: 10;
-            animation: slideIn 0.8s ease-out;
         }
 
-        .login-card {
+        .auth-card {
             background: rgba(26, 11, 46, 0.98);
             backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
             border-radius: 40px;
             padding: 50px 40px;
             width: 100%;
             max-width: 450px;
-            border: 2px solid var(--joker-purple);
-            box-shadow: 0 0 60px var(--joker-glow);
+            border: 2px solid var(--primary);
+            box-shadow: 0 0 50px var(--primary);
             animation: glow 3s ease-in-out infinite;
-            transform: translateZ(0);
-            will-change: box-shadow;
         }
 
-        .login-logo {
+        .auth-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid rgba(139, 92, 246, 0.3);
+            padding-bottom: 20px;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 12px;
+            background: transparent;
+            border: 2px solid var(--primary);
+            border-radius: 30px;
+            color: white;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .auth-tab.active {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border-color: transparent;
+        }
+
+        .auth-form {
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .auth-logo {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
         }
 
-        .login-logo i {
-            font-size: 80px;
-            color: var(--joker-light);
+        .auth-logo i {
+            font-size: 60px;
+            color: var(--primary-light);
             animation: pulse 2s ease-in-out infinite;
         }
 
-        .login-logo h1 {
-            font-size: 36px;
+        .auth-logo h1 {
+            font-size: 28px;
             color: white;
-            text-shadow: 0 0 30px var(--joker-purple);
-            margin: 15px 0;
+            margin-top: 10px;
         }
 
-        .login-logo p {
-            color: var(--joker-light);
-            font-size: 13px;
-            letter-spacing: 2px;
+        .form-group {
+            margin-bottom: 20px;
         }
 
-        .login-input-group {
-            margin-bottom: 25px;
-        }
-
-        .login-input-group input {
+        .form-group input {
             width: 100%;
-            padding: 16px 25px;
+            padding: 15px 20px;
             background: rgba(255,255,255,0.05);
-            border: 2px solid var(--joker-purple);
+            border: 2px solid var(--primary);
             border-radius: 30px;
             color: white;
-            font-size: 15px;
+            font-size: 14px;
             font-family: 'Orbitron', sans-serif;
-            transition: var(--transition-fast);
-            transform: translateZ(0);
+            transition: all 0.3s;
         }
 
-        .login-input-group input:focus {
+        .form-group input:focus {
             outline: none;
-            border-color: var(--joker-light);
-            box-shadow: 0 0 40px var(--joker-glow);
-            transform: scale(1.01);
+            border-color: var(--primary-light);
+            box-shadow: 0 0 30px var(--primary);
         }
 
-        .login-btn {
+        .form-group input::placeholder {
+            color: rgba(255,255,255,0.5);
+        }
+
+        .auth-btn {
             width: 100%;
-            padding: 16px;
-            background: linear-gradient(135deg, var(--joker-purple), var(--joker-light));
+            padding: 15px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
             border: none;
             border-radius: 30px;
             color: white;
             font-size: 16px;
             font-weight: 700;
             cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            transition: var(--transition-fast);
             font-family: 'Orbitron', sans-serif;
-            transform: translateZ(0);
-            will-change: transform;
+            transition: all 0.3s;
         }
 
-        .login-btn:hover {
-            transform: translateY(-3px) scale(1.02);
+        .auth-btn:hover {
+            transform: translateY(-3px);
             box-shadow: 0 20px 40px rgba(139, 92, 246, 0.4);
         }
 
-        /* Dashboard - Optimized */
+        .alert {
+            padding: 12px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 13px;
+        }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid var(--danger);
+            color: white;
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid var(--success);
+            color: white;
+        }
+
+        /* Dashboard */
         .dashboard {
-            padding: 30px 30px 30px 90px;
+            padding: 30px;
             position: relative;
             z-index: 10;
         }
@@ -455,133 +574,153 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
         .header {
             background: rgba(26, 11, 46, 0.98);
             backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
             border-radius: 30px;
             padding: 20px 30px;
             margin-bottom: 25px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border: 2px solid var(--joker-purple);
-            box-shadow: 0 0 40px var(--joker-glow);
-            animation: slideIn 0.5s ease-out;
-            transform: translateZ(0);
+            border: 2px solid var(--primary);
+            box-shadow: 0 0 30px var(--primary);
         }
 
-        .header h1 {
-            color: white;
-            font-size: 28px;
+        .user-info {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 20px;
         }
 
-        .header h1 i {
-            color: var(--joker-light);
-            animation: pulse 2s ease-in-out infinite;
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+
+        .user-details h3 {
+            color: white;
+            font-size: 18px;
+        }
+
+        .user-details p {
+            color: var(--primary-light);
+            font-size: 12px;
         }
 
         .badge {
-            background: linear-gradient(135deg, var(--joker-purple), var(--joker-light));
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
             padding: 8px 20px;
             border-radius: 30px;
             color: white;
             font-weight: 600;
-            font-size: 13px;
-            letter-spacing: 1px;
+            font-size: 12px;
         }
 
         .logout-btn {
             background: rgba(239, 68, 68, 0.2);
             color: white;
-            border: 1px solid #ef4444;
-            padding: 8px 20px;
+            border: 1px solid var(--danger);
+            padding: 10px 20px;
             border-radius: 30px;
             text-decoration: none;
-            transition: var(--transition-fast);
+            transition: all 0.3s;
             font-size: 13px;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
         }
 
         .logout-btn:hover {
-            background: #ef4444;
+            background: var(--danger);
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(239,68,68,0.3);
         }
 
-        /* Cards Grid - Optimized */
-        .grid {
+        /* Stats Cards */
+        .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
             margin-bottom: 25px;
         }
 
-        .card {
+        .stat-card {
             background: rgba(26, 11, 46, 0.95);
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
             border-radius: 25px;
-            padding: 20px 15px;
-            border: 2px solid var(--joker-purple);
-            cursor: pointer;
-            text-align: center;
-            transition: var(--transition-fast);
-            animation: slideIn 0.5s ease-out;
-            animation-fill-mode: both;
-            transform: translateZ(0);
-            will-change: transform;
+            padding: 20px;
+            border: 2px solid var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
 
-        .card:nth-child(1) { animation-delay: 0.05s; }
-        .card:nth-child(2) { animation-delay: 0.1s; }
-        .card:nth-child(3) { animation-delay: 0.15s; }
-        .card:nth-child(4) { animation-delay: 0.2s; }
-        .card:nth-child(5) { animation-delay: 0.25s; }
-        .card:nth-child(6) { animation-delay: 0.3s; }
-        .card:nth-child(7) { animation-delay: 0.35s; }
-
-        .card:hover {
-            transform: translateY(-8px) scale(1.02);
-            border-color: var(--joker-light);
-            box-shadow: 0 20px 40px rgba(139, 92, 246, 0.3);
-        }
-
-        .card-icon {
+        .stat-icon {
             width: 50px;
             height: 50px;
-            background: linear-gradient(135deg, var(--joker-purple), var(--joker-light));
-            border-radius: 18px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border-radius: 15px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 12px;
-        }
-
-        .card-icon i {
             font-size: 24px;
             color: white;
         }
 
-        .card h3 {
+        .stat-info h3 {
             color: white;
-            font-size: 13px;
-            font-weight: 600;
+            font-size: 14px;
+            opacity: 0.8;
         }
 
-        /* Query Box - Optimized */
+        .stat-info p {
+            color: var(--primary-light);
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        /* Category Grid */
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .category-card {
+            background: rgba(26, 11, 46, 0.95);
+            border-radius: 20px;
+            padding: 15px;
+            border: 2px solid var(--primary);
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-light);
+            box-shadow: 0 10px 20px rgba(139, 92, 246, 0.3);
+        }
+
+        .category-card i {
+            font-size: 30px;
+            color: var(--primary-light);
+            margin-bottom: 10px;
+        }
+
+        .category-card h3 {
+            color: white;
+            font-size: 12px;
+        }
+
+        /* Query Box */
         .query-box {
             background: rgba(26, 11, 46, 0.98);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
             border-radius: 30px;
             padding: 30px;
             margin-bottom: 25px;
-            border: 2px solid var(--joker-purple);
-            animation: slideIn 0.6s ease-out;
-            transform: translateZ(0);
+            border: 2px solid var(--primary);
         }
 
         .query-header {
@@ -590,85 +729,73 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
             gap: 15px;
             margin-bottom: 20px;
             padding-bottom: 15px;
-            border-bottom: 2px solid var(--joker-purple);
+            border-bottom: 2px solid var(--primary);
         }
 
         .query-header i {
             font-size: 40px;
-            color: var(--joker-light);
-            animation: pulse 2s ease-in-out infinite;
+            color: var(--primary-light);
         }
 
         .query-header h2 {
             color: white;
-            font-size: 22px;
-            font-weight: 700;
+            font-size: 20px;
         }
 
-        .input-group {
+        .query-input-group {
             display: flex;
-            gap: 12px;
-            margin-bottom: 12px;
+            gap: 10px;
+            margin-bottom: 10px;
         }
 
-        .input-group input {
+        .query-input-group input {
             flex: 1;
-            padding: 16px 25px;
+            padding: 15px 20px;
             background: rgba(255,255,255,0.05);
-            border: 2px solid var(--joker-purple);
+            border: 2px solid var(--primary);
             border-radius: 25px;
             color: white;
-            font-size: 15px;
             font-family: 'Orbitron', sans-serif;
-            transition: var(--transition-fast);
-            transform: translateZ(0);
         }
 
-        .input-group input:focus {
+        .query-input-group input:focus {
             outline: none;
-            border-color: var(--joker-light);
-            box-shadow: 0 0 30px var(--joker-glow);
-            transform: scale(1.01);
+            border-color: var(--primary-light);
+            box-shadow: 0 0 20px var(--primary);
         }
 
-        .input-group button {
-            padding: 16px 35px;
-            background: linear-gradient(135deg, var(--joker-purple), var(--joker-light));
+        .query-input-group button {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
             border: none;
             border-radius: 25px;
             color: white;
             font-weight: 600;
             cursor: pointer;
-            transition: var(--transition-fast);
             font-family: 'Orbitron', sans-serif;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transform: translateZ(0);
-            will-change: transform;
+            transition: all 0.3s;
         }
 
-        .input-group button:hover:not(:disabled) {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 15px 30px rgba(139, 92, 246, 0.4);
+        .query-input-group button:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(139, 92, 246, 0.4);
         }
 
-        .input-group button:disabled {
+        .query-input-group button:disabled {
             opacity: 0.5;
             cursor: not-allowed;
         }
 
-        .example {
-            color: var(--joker-light);
-            font-size: 13px;
+        .example-text {
+            color: var(--primary-light);
+            font-size: 12px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 5px;
             opacity: 0.8;
         }
 
-        /* Loader - Optimized */
+        /* Loader */
         .loader {
             display: none;
             text-align: center;
@@ -678,13 +805,11 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
         .spinner {
             width: 50px;
             height: 50px;
-            border: 3px solid var(--joker-purple);
-            border-top-color: var(--joker-light);
+            border: 3px solid var(--primary);
+            border-top-color: var(--primary-light);
             border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin: 0 auto 12px;
-            transform: translateZ(0);
-            will-change: transform;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
         }
 
         @keyframes spin {
@@ -693,83 +818,70 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
 
         .loader p {
             color: white;
-            font-size: 14px;
-            animation: pulse 1.5s ease-in-out infinite;
         }
 
-        /* Result - Optimized */
+        /* Result */
         .result {
             background: rgba(0,0,0,0.3);
-            border-radius: 25px;
+            border-radius: 20px;
             padding: 20px;
             margin-top: 20px;
-            border: 2px solid var(--joker-purple);
+            border: 2px solid var(--primary);
             display: none;
-            animation: slideIn 0.4s ease-out;
-            transform: translateZ(0);
         }
 
         .result-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
 
         .result-header h3 {
-            color: var(--joker-green);
+            color: var(--success);
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 5px;
             font-size: 16px;
         }
 
         .result-actions {
             display: flex;
-            gap: 8px;
+            gap: 5px;
         }
 
         .result-actions button {
-            padding: 6px 12px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid var(--joker-purple);
-            border-radius: 12px;
+            padding: 5px 10px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid var(--primary);
+            border-radius: 10px;
             color: white;
             cursor: pointer;
-            transition: var(--transition-fast);
-            font-size: 12px;
-            transform: translateZ(0);
+            transition: all 0.2s;
         }
 
         .result-actions button:hover {
-            background: var(--joker-purple);
-            transform: scale(1.05);
+            background: var(--primary);
         }
 
         .result-content {
             background: rgba(0,0,0,0.5);
             border-radius: 15px;
-            padding: 20px;
+            padding: 15px;
             font-family: monospace;
             font-size: 12px;
-            color: var(--joker-light);
-            max-height: 400px;
+            color: var(--primary-light);
+            max-height: 300px;
             overflow-y: auto;
             white-space: pre-wrap;
-            word-break: break-word;
-            border: 1px solid var(--joker-purple);
         }
 
-        /* Recent - Optimized */
-        .recent {
+        /* Recent Queries */
+        .recent-section {
             background: rgba(26, 11, 46, 0.98);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
             border-radius: 30px;
             padding: 30px;
-            border: 2px solid var(--joker-purple);
-            animation: slideIn 0.7s ease-out;
-            transform: translateZ(0);
+            border: 2px solid var(--primary);
         }
 
         .recent-header {
@@ -784,324 +896,438 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
             display: flex;
             align-items: center;
             gap: 10px;
-            font-size: 20px;
+            font-size: 18px;
         }
 
         .clear-btn {
-            padding: 8px 18px;
+            padding: 8px 15px;
             background: rgba(239, 68, 68, 0.2);
-            border: 1px solid #ef4444;
+            border: 1px solid var(--danger);
             border-radius: 20px;
             color: white;
             cursor: pointer;
             font-family: 'Orbitron', sans-serif;
-            transition: var(--transition-fast);
             font-size: 12px;
         }
 
         .clear-btn:hover {
-            background: #ef4444;
-            transform: scale(1.02);
+            background: var(--danger);
         }
 
         .recent-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-            gap: 12px;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
         }
 
         .recent-item {
             background: rgba(0,0,0,0.3);
-            border-radius: 18px;
-            padding: 15px;
+            border-radius: 15px;
+            padding: 12px;
             cursor: pointer;
-            transition: var(--transition-fast);
-            border: 1px solid transparent;
-            transform: translateZ(0);
-            will-change: transform;
+            transition: all 0.3s;
         }
 
         .recent-item:hover {
             background: rgba(139, 92, 246, 0.2);
-            transform: translateX(8px) scale(1.01);
-            border-color: var(--joker-purple);
+            transform: translateX(5px);
         }
 
         .recent-type {
-            background: linear-gradient(135deg, var(--joker-purple), var(--joker-light));
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
             color: white;
-            padding: 4px 12px;
-            border-radius: 20px;
+            padding: 3px 10px;
+            border-radius: 15px;
             font-size: 10px;
             display: inline-block;
-            margin-bottom: 8px;
-            font-weight: 600;
+            margin-bottom: 5px;
         }
 
         .recent-param {
             color: white;
             font-weight: 600;
-            margin-bottom: 5px;
-            font-size: 13px;
+            font-size: 12px;
             word-break: break-all;
         }
 
         .recent-time {
             color: rgba(255,255,255,0.4);
-            font-size: 10px;
+            font-size: 9px;
+            margin-top: 5px;
+        }
+
+        /* Admin Panel */
+        .admin-panel {
+            margin-top: 25px;
+            padding: 25px;
+            background: rgba(26, 11, 46, 0.98);
+            border-radius: 30px;
+            border: 3px solid var(--warning);
+        }
+
+        .admin-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--warning);
+        }
+
+        .admin-header i {
+            font-size: 40px;
+            color: var(--warning);
+        }
+
+        .admin-header h2 {
+            color: white;
+            font-size: 22px;
+        }
+
+        .admin-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .admin-stat-card {
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            padding: 15px;
+            border: 1px solid var(--warning);
+        }
+
+        .admin-stat-card h4 {
+            color: var(--warning);
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .admin-stat-card p {
+            color: white;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .admin-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .admin-tab {
+            padding: 10px 20px;
+            background: transparent;
+            border: 2px solid var(--warning);
+            border-radius: 25px;
+            color: white;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .admin-tab.active {
+            background: var(--warning);
+            border-color: transparent;
+        }
+
+        .admin-content {
+            display: none;
+        }
+
+        .admin-content.active {
+            display: block;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .admin-table {
+            width: 100%;
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .admin-table th {
+            background: var(--warning);
+            color: white;
+            padding: 12px;
+            font-size: 12px;
+            text-align: left;
+        }
+
+        .admin-table td {
+            padding: 12px;
+            color: white;
+            font-size: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .admin-table tr:hover {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .admin-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 11px;
+            margin: 0 2px;
+        }
+
+        .btn-warning { background: var(--warning); color: black; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-info { background: var(--info); color: white; }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: rgba(26, 11, 46, 0.98);
+            border-radius: 30px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            border: 3px solid var(--warning);
+        }
+
+        .modal-content h3 {
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .modal-content input,
+        .modal-content select,
+        .modal-content textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            background: rgba(255,255,255,0.05);
+            border: 2px solid var(--primary);
+            border-radius: 15px;
+            color: white;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
         }
 
         /* Responsive */
         @media (max-width: 768px) {
             .dashboard {
-                padding: 20px;
-            }
-            
-            .menu-toggle {
-                top: 20px;
-                left: 20px;
-                width: 45px;
-                height: 45px;
-            }
-            
-            .side-menu {
-                width: 100%;
-                left: -100%;
+                padding: 15px;
             }
             
             .header {
                 flex-direction: column;
-                gap: 12px;
-                text-align: center;
-                padding: 15px;
-            }
-            
-            .header h1 {
-                font-size: 20px;
-            }
-            
-            .input-group {
-                flex-direction: column;
-            }
-            
-            .query-header {
-                flex-direction: column;
+                gap: 15px;
                 text-align: center;
             }
             
-            .grid {
-                grid-template-columns: repeat(3, 1fr);
+            .user-info {
+                flex-direction: column;
             }
             
-            .login-card {
-                padding: 30px 20px;
+            .query-input-group {
+                flex-direction: column;
             }
             
-            .login-logo h1 {
-                font-size: 24px;
+            .stats-grid {
+                grid-template-columns: 1fr;
             }
-        }
-
-        /* Scrollbar - Optimized */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--joker-darker);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--joker-purple);
-            border-radius: 8px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--joker-light);
-        }
-
-        /* Utility Classes */
-        .success-icon {
-            color: var(--joker-green);
-            animation: pulse 1s ease-in-out;
-        }
-
-        .error-icon {
-            color: var(--joker-red);
-            animation: pulse 1s ease-in-out;
         }
     </style>
 </head>
 <body>
     <!-- Background Elements -->
-    <div class="bg-gradient"></div>
-    
-    <?php
-    // Optimized particles - fewer but smoother
-    for ($i = 0; $i < 30; $i++): 
-        $left = rand(0, 100);
-        $delay = rand(0, 15);
-        $duration = rand(15, 25);
-    ?>
-    <div class="particle" style="left: <?= $left ?>%; animation-delay: <?= $delay ?>s; animation-duration: <?= $duration ?>s;"></div>
-    <?php endfor; ?>
-
-    <!-- Floating Cards -->
     <div class="floating-card card1">♠</div>
     <div class="floating-card card2">♣</div>
     <div class="floating-card card3">♥</div>
     <div class="floating-card card4">♦</div>
-    <div class="floating-card card5">🃏</div>
+    
+    <?php for ($i = 0; $i < 20; $i++): ?>
+    <div class="particle" style="left: <?= rand(0, 100) ?>%; animation-delay: <?= rand(0, 10) ?>s;"></div>
+    <?php endfor; ?>
 
-    <?php if (!$giris_yapildi): ?>
-    <!-- LOGIN -->
-    <div class="login-wrapper">
-        <div class="login-card">
-            <div class="login-logo">
+    <?php if (!$kullanici): ?>
+    <!-- Login/Register -->
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-logo">
                 <i class="fas fa-crown"></i>
-                <h1>NGB SORGU</h1>
-                <p>ULTIMATE PANEL</p>
+                <h1>NGB SORGU PANELİ</h1>
+            </div>
+            
+            <div class="auth-tabs">
+                <button class="auth-tab active" onclick="switchTab('login')">GİRİŞ</button>
+                <button class="auth-tab" onclick="switchTab('register')">KAYIT</button>
             </div>
             
             <?php if (isset($hata)): ?>
-                <div style="background: rgba(239,68,68,0.2); color: white; padding: 12px; border-radius: 20px; margin-bottom: 20px; text-align: center; font-size: 14px; border: 1px solid #ef4444;">
-                    <i class="fas fa-exclamation-triangle error-icon"></i> <?= $hata ?>
-                </div>
+                <div class="alert alert-error"><?= $hata ?></div>
             <?php endif; ?>
             
-            <form method="POST">
-                <div class="login-input-group">
-                    <input type="password" name="password" placeholder="ŞİFRE" required>
+            <?php if (isset($kayit_basarili)): ?>
+                <div class="alert alert-success"><?= $kayit_basarili ?></div>
+            <?php endif; ?>
+            
+            <?php if (isset($ban_hata)): ?>
+                <div class="alert alert-error"><?= $ban_hata ?></div>
+            <?php endif; ?>
+            
+            <!-- Login Form -->
+            <form class="auth-form active" id="loginForm" method="POST">
+                <div class="form-group">
+                    <input type="text" name="username" placeholder="Kullanıcı Adı" required>
                 </div>
-                <button type="submit" name="login" class="login-btn">GİRİŞ</button>
+                <div class="form-group">
+                    <input type="password" name="password" placeholder="Şifre" required>
+                </div>
+                <button type="submit" name="login" class="auth-btn">GİRİŞ YAP</button>
             </form>
             
-            <div style="text-align: center; margin-top: 25px; color: var(--joker-light); font-size: 12px; opacity: 0.7;">
-                Şifre: @ngbwayfite
-            </div>
+            <!-- Register Form -->
+            <form class="auth-form" id="registerForm" method="POST">
+                <div class="form-group">
+                    <input type="text" name="username" placeholder="Kullanıcı Adı" required>
+                </div>
+                <div class="form-group">
+                    <input type="email" name="email" placeholder="E-posta" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" name="fullname" placeholder="Ad Soyad" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" name="password" placeholder="Şifre" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" name="confirm_password" placeholder="Şifre Tekrar" required>
+                </div>
+                <button type="submit" name="register" class="auth-btn">KAYIT OL</button>
+            </form>
         </div>
     </div>
-    
+
+    <script>
+        function switchTab(tab) {
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+            
+            if (tab === 'login') {
+                document.querySelector('.auth-tab:first-child').classList.add('active');
+                document.getElementById('loginForm').classList.add('active');
+            } else {
+                document.querySelector('.auth-tab:last-child').classList.add('active');
+                document.getElementById('registerForm').classList.add('active');
+            }
+        }
+    </script>
+
     <?php else: ?>
-    <!-- Hamburger Menu -->
-    <div class="menu-toggle" id="menuToggle" onclick="toggleMenu()">
-        <span></span>
-        <span></span>
-        <span></span>
-    </div>
-
-    <!-- Side Menu -->
-    <div class="side-menu" id="sideMenu">
-        <div class="menu-header">
-            <i class="fas fa-crown"></i>
-            <h2>SORGU MENÜSÜ</h2>
-        </div>
-        
-        <div class="menu-category">
-            <div class="menu-category-title">🔴 TC SORGULARI</div>
-            <div class="menu-items">
-                <div class="menu-item" onclick="setTypeAndClose('tc1')"><i class="fas fa-id-card"></i> TC-1</div>
-                <div class="menu-item" onclick="setTypeAndClose('tc2')"><i class="fas fa-id-card"></i> TC-2</div>
-                <div class="menu-item" onclick="setTypeAndClose('tcgsm')"><i class="fas fa-mobile-alt"></i> TC'den GSM</div>
-            </div>
-        </div>
-        
-        <div class="menu-category">
-            <div class="menu-category-title">👪 AİLE SORGULARI</div>
-            <div class="menu-items">
-                <div class="menu-item" onclick="setTypeAndClose('aile')"><i class="fas fa-users"></i> Aile</div>
-                <div class="menu-item" onclick="setTypeAndClose('aile_pro')"><i class="fas fa-users"></i> Aile Pro</div>
-                <div class="menu-item" onclick="setTypeAndClose('sulale')"><i class="fas fa-tree"></i> Sülale</div>
-            </div>
-        </div>
-        
-        <div class="menu-category">
-            <div class="menu-category-title">👤 İSİM SORGULARI</div>
-            <div class="menu-items">
-                <div class="menu-item" onclick="setTypeAndClose('isim')"><i class="fas fa-user"></i> İsim</div>
-                <div class="menu-item" onclick="setTypeAndClose('isim_pro')"><i class="fas fa-user"></i> İsim Pro</div>
-                <div class="menu-item" onclick="setTypeAndClose('isim_il')"><i class="fas fa-map-marker-alt"></i> İsim+İlçe</div>
-            </div>
-        </div>
-        
-        <div class="menu-category">
-            <div class="menu-category-title">🏠 ADRES SORGULARI</div>
-            <div class="menu-items">
-                <div class="menu-item" onclick="setTypeAndClose('adres')"><i class="fas fa-map-marker-alt"></i> Adres</div>
-                <div class="menu-item" onclick="setTypeAndClose('adres_pro')"><i class="fas fa-map-marker-alt"></i> Adres Pro</div>
-            </div>
-        </div>
-        
-        <div class="menu-category">
-            <div class="menu-category-title">💼 İŞ SORGULARI</div>
-            <div class="menu-items">
-                <div class="menu-item" onclick="setTypeAndClose('isyeri')"><i class="fas fa-briefcase"></i> İş Yeri</div>
-                <div class="menu-item" onclick="setTypeAndClose('isyeri_ark')"><i class="fas fa-users"></i> İş Arkadaş</div>
-            </div>
-        </div>
-        
-        <div class="menu-category">
-            <div class="menu-category-title">📱 GSM SORGULARI</div>
-            <div class="menu-items">
-                <div class="menu-item" onclick="setTypeAndClose('gsmtc')"><i class="fas fa-mobile-alt"></i> GSM>TC</div>
-                <div class="menu-item" onclick="setTypeAndClose('gncloperator')"><i class="fas fa-signal"></i> Operatör</div>
-            </div>
-        </div>
-        
-        <div class="menu-category">
-            <div class="menu-category-title">💰 FİNANS</div>
-            <div class="menu-items">
-                <div class="menu-item" onclick="setTypeAndClose('iban')"><i class="fas fa-coins"></i> IBAN</div>
-            </div>
-        </div>
-    </div>
-
     <!-- Dashboard -->
     <div class="dashboard">
+        <!-- Header -->
         <div class="header">
-            <h1>
-                <i class="fas fa-crown"></i>
-                NGB SORGU
-            </h1>
+            <div class="user-info">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="user-details">
+                    <h3><?= htmlspecialchars($kullanici['fullname']) ?></h3>
+                    <p>@<?= htmlspecialchars($kullanici['username']) ?></p>
+                </div>
+            </div>
             <div style="display: flex; gap: 15px; align-items: center;">
-                <div class="badge">ULTIMATE</div>
+                <div class="badge"><?= $kullanici['role'] == 'admin' ? 'ADMIN' : 'KULLANICI' ?></div>
                 <a href="?logout=1" class="logout-btn"><i class="fas fa-sign-out-alt"></i> ÇIKIŞ</a>
             </div>
         </div>
-        
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-search"></i></div>
+                <div class="stat-info">
+                    <h3>Toplam Sorgu</h3>
+                    <p><?= $kullanici['total_queries'] ?></p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-calendar"></i></div>
+                <div class="stat-info">
+                    <h3>Kayıt Tarihi</h3>
+                    <p><?= date('d.m.Y', strtotime($kullanici['created_at'])) ?></p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                <div class="stat-info">
+                    <h3>Son Giriş</h3>
+                    <p><?= $kullanici['last_login'] ? date('d.m.Y H:i', strtotime($kullanici['last_login'])) : 'Yeni' ?></p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-globe"></i></div>
+                <div class="stat-info">
+                    <h3>IP Adresi</h3>
+                    <p><?= $kullanici['last_ip'] ?></p>
+                </div>
+            </div>
+        </div>
+
         <!-- Quick Categories -->
-        <div class="grid">
-            <div class="card" onclick="setCategory('tc')">
-                <div class="card-icon"><i class="fas fa-id-card"></i></div>
+        <div class="category-grid">
+            <div class="category-card" onclick="setCategory('tc')">
+                <i class="fas fa-id-card"></i>
                 <h3>TC</h3>
             </div>
-            <div class="card" onclick="setCategory('aile')">
-                <div class="card-icon"><i class="fas fa-users"></i></div>
+            <div class="category-card" onclick="setCategory('aile')">
+                <i class="fas fa-users"></i>
                 <h3>AİLE</h3>
             </div>
-            <div class="card" onclick="setCategory('isim')">
-                <div class="card-icon"><i class="fas fa-user"></i></div>
+            <div class="category-card" onclick="setCategory('isim')">
+                <i class="fas fa-user"></i>
                 <h3>İSİM</h3>
             </div>
-            <div class="card" onclick="setCategory('adres')">
-                <div class="card-icon"><i class="fas fa-map-marker-alt"></i></div>
+            <div class="category-card" onclick="setCategory('adres')">
+                <i class="fas fa-map-marker-alt"></i>
                 <h3>ADRES</h3>
             </div>
-            <div class="card" onclick="setCategory('is')">
-                <div class="card-icon"><i class="fas fa-briefcase"></i></div>
+            <div class="category-card" onclick="setCategory('is')">
+                <i class="fas fa-briefcase"></i>
                 <h3>İŞ</h3>
             </div>
-            <div class="card" onclick="setCategory('gsm')">
-                <div class="card-icon"><i class="fas fa-mobile-alt"></i></div>
+            <div class="category-card" onclick="setCategory('gsm')">
+                <i class="fas fa-mobile-alt"></i>
                 <h3>GSM</h3>
             </div>
-            <div class="card" onclick="setCategory('finans')">
-                <div class="card-icon"><i class="fas fa-coins"></i></div>
+            <div class="category-card" onclick="setCategory('finans')">
+                <i class="fas fa-coins"></i>
                 <h3>FİNANS</h3>
             </div>
         </div>
-        
+
         <!-- Query Box -->
         <div class="query-box">
             <div class="query-header">
@@ -1110,14 +1336,14 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
                 <div class="badge" id="queryBadge">TC-1</div>
             </div>
             
-            <div class="input-group">
+            <div class="query-input-group">
                 <input type="text" id="queryParam" placeholder="Parametre girin..." onkeypress="if(event.key==='Enter') executeQuery()">
                 <button onclick="executeQuery()" id="queryBtn">
                     <i class="fas fa-search"></i> SORGULA
                 </button>
             </div>
             
-            <div class="example" id="queryExample">
+            <div class="example-text" id="queryExample">
                 <i class="fas fa-info-circle"></i> Örnek: 11111111110
             </div>
             
@@ -1128,23 +1354,255 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
             
             <div class="result" id="resultContainer">
                 <div class="result-header">
-                    <h3><i class="fas fa-check-circle success-icon"></i> SONUÇ</h3>
+                    <h3><i class="fas fa-check-circle"></i> SONUÇ</h3>
                     <div class="result-actions">
-                        <button onclick="copyResult()" title="Kopyala"><i class="fas fa-copy"></i></button>
-                        <button onclick="downloadResult()" title="İndir"><i class="fas fa-download"></i></button>
+                        <button onclick="copyResult()"><i class="fas fa-copy"></i></button>
+                        <button onclick="downloadResult()"><i class="fas fa-download"></i></button>
                     </div>
                 </div>
                 <div class="result-content" id="resultContent"></div>
             </div>
         </div>
-        
+
         <!-- Recent Queries -->
-        <div class="recent">
+        <div class="recent-section">
             <div class="recent-header">
-                <h2><i class="fas fa-history"></i> SON SORGULAR</h2>
+                <h2><i class="fas fa-history"></i> SON SORGULARIM</h2>
                 <button class="clear-btn" onclick="clearRecent()">TEMİZLE</button>
             </div>
             <div class="recent-grid" id="recentGrid"></div>
+        </div>
+
+        <?php if ($isAdmin): ?>
+        <!-- Admin Panel -->
+        <div class="admin-panel">
+            <div class="admin-header">
+                <i class="fas fa-crown"></i>
+                <h2>ADMIN PANELİ</h2>
+            </div>
+
+            <?php
+            // Admin istatistikleri
+            $stmt = $db->query("SELECT COUNT(*) as total_users FROM users");
+            $total_users = $stmt->fetch(PDO::FETCH_ASSOC)['total_users'];
+            
+            $stmt = $db->query("SELECT COUNT(*) as total_queries FROM query_logs");
+            $total_queries = $stmt->fetch(PDO::FETCH_ASSOC)['total_queries'];
+            
+            $stmt = $db->query("SELECT COUNT(*) as active_today FROM users WHERE last_login > datetime('now', '-1 day')");
+            $active_today = $stmt->fetch(PDO::FETCH_ASSOC)['active_today'];
+            
+            $stmt = $db->query("SELECT COUNT(*) as banned_users FROM users WHERE status = 'banned'");
+            $banned_users = $stmt->fetch(PDO::FETCH_ASSOC)['banned_users'];
+            ?>
+
+            <div class="admin-stats">
+                <div class="admin-stat-card">
+                    <h4>Toplam Kullanıcı</h4>
+                    <p><?= $total_users ?></p>
+                </div>
+                <div class="admin-stat-card">
+                    <h4>Toplam Sorgu</h4>
+                    <p><?= $total_queries ?></p>
+                </div>
+                <div class="admin-stat-card">
+                    <h4>Aktif (24s)</h4>
+                    <p><?= $active_today ?></p>
+                </div>
+                <div class="admin-stat-card">
+                    <h4>Banlı</h4>
+                    <p><?= $banned_users ?></p>
+                </div>
+            </div>
+
+            <div class="admin-tabs">
+                <button class="admin-tab active" onclick="switchAdminTab('users')">KULLANICILAR</button>
+                <button class="admin-tab" onclick="switchAdminTab('queries')">SORGULAR</button>
+                <button class="admin-tab" onclick="switchAdminTab('logs')">LOG KAYITLARI</button>
+                <button class="admin-tab" onclick="switchAdminTab('settings')">AYARLAR</button>
+            </div>
+
+            <!-- Users Tab -->
+            <div class="admin-content active" id="adminUsers">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Kullanıcı</th>
+                            <th>Ad Soyad</th>
+                            <th>Rol</th>
+                            <th>Sorgu</th>
+                            <th>Durum</th>
+                            <th>Son Giriş</th>
+                            <th>İşlem</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $stmt = $db->query("SELECT * FROM users ORDER BY id DESC LIMIT 20");
+                        while($user = $stmt->fetch(PDO::FETCH_ASSOC)):
+                        ?>
+                        <tr>
+                            <td><?= $user['id'] ?></td>
+                            <td><?= htmlspecialchars($user['username']) ?></td>
+                            <td><?= htmlspecialchars($user['fullname']) ?></td>
+                            <td><?= $user['role'] ?></td>
+                            <td><?= $user['total_queries'] ?></td>
+                            <td>
+                                <span style="color: <?= $user['status'] == 'active' ? 'var(--success)' : 'var(--danger)' ?>">
+                                    <?= $user['status'] ?>
+                                </span>
+                            </td>
+                            <td><?= $user['last_login'] ? date('d.m H:i', strtotime($user['last_login'])) : '-' ?></td>
+                            <td>
+                                <button class="admin-btn btn-info" onclick="viewUser(<?= $user['id'] ?>)"><i class="fas fa-eye"></i></button>
+                                <button class="admin-btn btn-warning" onclick="banUser(<?= $user['id'] ?>, '<?= $user['username'] ?>')"><i class="fas fa-ban"></i></button>
+                                <button class="admin-btn btn-success" onclick="changeRole(<?= $user['id'] ?>, '<?= $user['username'] ?>')"><i class="fas fa-crown"></i></button>
+                                <button class="admin-btn btn-danger" onclick="deleteUser(<?= $user['id'] ?>, '<?= $user['username'] ?>')"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                        <?php endwhile; ?>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Queries Tab -->
+            <div class="admin-content" id="adminQueries">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Kullanıcı</th>
+                            <th>Sorgu Tipi</th>
+                            <th>Parametre</th>
+                            <th>IP</th>
+                            <th>Tarih</th>
+                            <th>Durum</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $stmt = $db->query("SELECT * FROM query_logs ORDER BY id DESC LIMIT 20");
+                        while($log = $stmt->fetch(PDO::FETCH_ASSOC)):
+                        ?>
+                        <tr>
+                            <td><?= $log['id'] ?></td>
+                            <td><?= htmlspecialchars($log['username']) ?></td>
+                            <td><?= $log['query_type'] ?></td>
+                            <td><?= htmlspecialchars($log['query_param']) ?></td>
+                            <td><?= $log['ip'] ?></td>
+                            <td><?= date('d.m H:i', strtotime($log['created_at'])) ?></td>
+                            <td>
+                                <span style="color: var(--success)">✓</span>
+                            </td>
+                        </tr>
+                        <?php endwhile; ?>
+                    </tbody>
+                </table>
+                <div style="margin-top: 15px;">
+                    <button class="admin-btn btn-danger" onclick="clearOldLogs()">
+                        <i class="fas fa-trash"></i> 30 GÜNDEN ESKİ LOGLARI TEMİZLE
+                    </button>
+                </div>
+            </div>
+
+            <!-- Logs Tab -->
+            <div class="admin-content" id="adminLogs">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Kullanıcı</th>
+                            <th>İşlem</th>
+                            <th>Detay</th>
+                            <th>IP</th>
+                            <th>Tarih</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $stmt = $db->query("SELECT * FROM activity_logs ORDER BY id DESC LIMIT 20");
+                        while($log = $stmt->fetch(PDO::FETCH_ASSOC)):
+                        ?>
+                        <tr>
+                            <td><?= $log['id'] ?></td>
+                            <td><?= htmlspecialchars($log['username']) ?></td>
+                            <td><?= $log['action'] ?></td>
+                            <td><?= htmlspecialchars($log['details']) ?></td>
+                            <td><?= $log['ip'] ?></td>
+                            <td><?= date('d.m H:i', strtotime($log['created_at'])) ?></td>
+                        </tr>
+                        <?php endwhile; ?>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Settings Tab -->
+            <div class="admin-content" id="adminSettings">
+                <div style="display: grid; gap: 20px;">
+                    <div>
+                        <h3 style="color: white; margin-bottom: 15px;">API Ayarları</h3>
+                        <button class="admin-btn btn-success" onclick="generateAPIKey()">
+                            <i class="fas fa-key"></i> Yeni API Anahtarı Oluştur
+                        </button>
+                    </div>
+                    
+                    <div>
+                        <h3 style="color: white; margin-bottom: 15px;">Sistem Bilgileri</h3>
+                        <table class="admin-table">
+                            <tr>
+                                <td>PHP Versiyon</td>
+                                <td><?= phpversion() ?></td>
+                            </tr>
+                            <tr>
+                                <td>Veritabanı</td>
+                                <td>SQLite3</td>
+                            </tr>
+                            <tr>
+                                <td>Sunucu Zamanı</td>
+                                <td><?= date('Y-m-d H:i:s') ?></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <?php endif; ?>
+    </div>
+
+    <!-- Modals -->
+    <div class="modal" id="banModal">
+        <div class="modal-content">
+            <h3>Kullanıcı Banla</h3>
+            <input type="hidden" id="banUserId">
+            <input type="text" id="banUsername" readonly style="background: rgba(255,255,255,0.1);">
+            <textarea id="banReason" placeholder="Ban sebebi" rows="3"></textarea>
+            <select id="banDuration">
+                <option value="1">1 Gün</option>
+                <option value="7">7 Gün</option>
+                <option value="30">30 Gün</option>
+                <option value="permanent">Süresiz</option>
+            </select>
+            <div class="modal-buttons">
+                <button class="admin-btn btn-success" onclick="confirmBan()">BANLA</button>
+                <button class="admin-btn btn-danger" onclick="closeModal('banModal')">İPTAL</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="roleModal">
+        <div class="modal-content">
+            <h3>Yetki Değiştir</h3>
+            <input type="hidden" id="roleUserId">
+            <input type="text" id="roleUsername" readonly style="background: rgba(255,255,255,0.1);">
+            <select id="newRole">
+                <option value="user">Kullanıcı</option>
+                <option value="admin">Admin</option>
+            </select>
+            <div class="modal-buttons">
+                <button class="admin-btn btn-success" onclick="confirmRole()">DEĞİŞTİR</button>
+                <button class="admin-btn btn-danger" onclick="closeModal('roleModal')">İPTAL</button>
+            </div>
         </div>
     </div>
 
@@ -1170,20 +1628,7 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
         };
 
         let currentType = 'tc1';
-        let recentQueries = JSON.parse(localStorage.getItem('recentQueries')) || [];
-
-        // Menu Functions
-        function toggleMenu() {
-            const menu = document.getElementById('sideMenu');
-            const toggle = document.getElementById('menuToggle');
-            menu.classList.toggle('active');
-            toggle.classList.toggle('active');
-        }
-
-        function setTypeAndClose(type) {
-            setType(type);
-            toggleMenu();
-        }
+        let recentQueries = JSON.parse(localStorage.getItem('recentQueries_' + <?= $kullanici['id'] ?>)) || [];
 
         function setCategory(cat) {
             const first = Object.values(apiList).find(api => api.category === cat);
@@ -1203,7 +1648,6 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
             document.getElementById('queryParam').placeholder = api.example;
         }
 
-        // Data Cleaner
         function cleanData(data) {
             const bannedKeys = ['developer', 'geliştirici', 'version', 'sürüm', 'v1', 'v2', 'v3', 'v4', 
                               'reklam', 'kanal', 'telegram', 't.me', 'punisher', 'admin', 'destek'];
@@ -1241,7 +1685,6 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
             return data;
         }
 
-        // Query Execution
         async function executeQuery() {
             const param = document.getElementById('queryParam').value.trim();
             if (!param) {
@@ -1257,7 +1700,6 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
                 return;
             }
 
-            // Show loader
             document.getElementById('queryLoader').style.display = 'block';
             document.getElementById('resultContainer').style.display = 'none';
             document.getElementById('queryBtn').disabled = true;
@@ -1283,26 +1725,22 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
                 const cleanedData = cleanData(data);
                 const resultStr = JSON.stringify(cleanedData, null, 2);
 
-                // Show result
                 document.getElementById('queryLoader').style.display = 'none';
                 document.getElementById('queryBtn').disabled = false;
                 
                 const resultContent = document.getElementById('resultContent');
                 resultContent.textContent = resultStr;
-                resultContent.classList.toggle('small', resultStr.length < 1000);
                 document.getElementById('resultContainer').style.display = 'block';
 
-                // Save to recent
                 recentQueries.unshift({
                     type: api.name,
                     param: param,
                     time: new Date().toLocaleString('tr-TR')
                 });
                 if (recentQueries.length > 10) recentQueries.pop();
-                localStorage.setItem('recentQueries', JSON.stringify(recentQueries));
+                localStorage.setItem('recentQueries_' + <?= $kullanici['id'] ?>, JSON.stringify(recentQueries));
                 loadRecent();
 
-                // Send to Telegram
                 const formData = new FormData();
                 formData.append('sorgu_kaydet', '1');
                 formData.append('sorgu_tipi', api.name);
@@ -1318,7 +1756,6 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
             }
         }
 
-        // Utility Functions
         function copyResult() {
             navigator.clipboard.writeText(document.getElementById('resultContent').textContent)
                 .then(() => alert('Kopyalandı!'))
@@ -1364,25 +1801,148 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
         function clearRecent() {
             if (confirm('Tüm son sorgular temizlensin mi?')) {
                 recentQueries = [];
-                localStorage.removeItem('recentQueries');
+                localStorage.removeItem('recentQueries_' + <?= $kullanici['id'] ?>);
                 loadRecent();
             }
         }
 
-        // Initialize
+        // Admin Functions
+        <?php if ($isAdmin): ?>
+        function switchAdminTab(tab) {
+            document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.admin-content').forEach(c => c.classList.remove('active'));
+            
+            if (tab === 'users') {
+                document.querySelector('.admin-tab:first-child').classList.add('active');
+                document.getElementById('adminUsers').classList.add('active');
+            } else if (tab === 'queries') {
+                document.querySelector('.admin-tab:nth-child(2)').classList.add('active');
+                document.getElementById('adminQueries').classList.add('active');
+            } else if (tab === 'logs') {
+                document.querySelector('.admin-tab:nth-child(3)').classList.add('active');
+                document.getElementById('adminLogs').classList.add('active');
+            } else {
+                document.querySelector('.admin-tab:last-child').classList.add('active');
+                document.getElementById('adminSettings').classList.add('active');
+            }
+        }
+
+        function viewUser(userId) {
+            // Kullanıcı detaylarını göster
+        }
+
+        function banUser(userId, username) {
+            document.getElementById('banUserId').value = userId;
+            document.getElementById('banUsername').value = username;
+            document.getElementById('banModal').classList.add('active');
+        }
+
+        function confirmBan() {
+            const userId = document.getElementById('banUserId').value;
+            const reason = document.getElementById('banReason').value;
+            const duration = document.getElementById('banDuration').value;
+
+            const formData = new FormData();
+            formData.append('admin_action', 'ban_user');
+            formData.append('user_id', userId);
+            formData.append('reason', reason);
+            formData.append('duration', duration);
+
+            fetch('', { method: 'POST', body: formData })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Kullanıcı banlandı!');
+                        location.reload();
+                    }
+                });
+
+            closeModal('banModal');
+        }
+
+        function changeRole(userId, username) {
+            document.getElementById('roleUserId').value = userId;
+            document.getElementById('roleUsername').value = username;
+            document.getElementById('roleModal').classList.add('active');
+        }
+
+        function confirmRole() {
+            const userId = document.getElementById('roleUserId').value;
+            const role = document.getElementById('newRole').value;
+
+            const formData = new FormData();
+            formData.append('admin_action', 'change_role');
+            formData.append('user_id', userId);
+            formData.append('role', role);
+
+            fetch('', { method: 'POST', body: formData })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Yetki değiştirildi!');
+                        location.reload();
+                    }
+                });
+
+            closeModal('roleModal');
+        }
+
+        function deleteUser(userId, username) {
+            if (confirm(username + ' kullanıcısını silmek istediğinize emin misiniz?')) {
+                const formData = new FormData();
+                formData.append('admin_action', 'delete_user');
+                formData.append('user_id', userId);
+
+                fetch('', { method: 'POST', body: formData })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Kullanıcı silindi!');
+                            location.reload();
+                        }
+                    });
+            }
+        }
+
+        function clearOldLogs() {
+            if (confirm('30 günden eski logları silmek istediğinize emin misiniz?')) {
+                const formData = new FormData();
+                formData.append('admin_action', 'clear_logs');
+                formData.append('days', '30');
+
+                fetch('', { method: 'POST', body: formData })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert(data.deleted + ' log silindi!');
+                            location.reload();
+                        }
+                    });
+            }
+        }
+
+        function generateAPIKey() {
+            const formData = new FormData();
+            formData.append('admin_action', 'generate_api_key');
+            formData.append('user_id', <?= $kullanici['id'] ?>);
+
+            fetch('', { method: 'POST', body: formData })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('API Anahtarı: ' + data.api_key);
+                    }
+                });
+        }
+        <?php endif; ?>
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             setType('tc1');
             loadRecent();
-        });
-
-        // Close menu on outside click
-        document.addEventListener('click', (e) => {
-            const menu = document.getElementById('sideMenu');
-            const toggle = document.getElementById('menuToggle');
-            if (!menu.contains(e.target) && !toggle.contains(e.target) && menu.classList.contains('active')) {
-                menu.classList.remove('active');
-                toggle.classList.remove('active');
-            }
         });
     </script>
     <?php endif; ?>
