@@ -697,99 +697,11 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
                 <h3>SOSYAL</h3>
             </div>
             <div class="card" onclick="setCategory('egitim')">
-                <div class="card-icon"><i cl55,0.5); font-size: 11px; }
-    </style>
-</head>
-<body>
-    <div class="floating-card card1">♠</div>
-    <div class="floating-card card2">♣</div>
-    <div class="floating-card card3">♥</div>
-    <div class="floating-card card4">♦</div>
-    <div class="floating-card card5">🃏</div>
-
-    <?php if (!$giris_yapildi): ?>
-    <!-- LOGIN -->
-    <div class="login-wrapper">
-        <div class="login-card">
-            <div class="login-logo">
-                <i class="fas fa-crown"></i>
-                <h1>NGB SORGU PANELİM.IO</h1>
-                <p style="color: var(--joker-light);">JOKER PROFESYONEL PANEL</p>
-            </div>
-
-            <?php if (isset($hata)): ?>
-                <div style="background: rgba(239,68,68,0.3); color: white; padding: 15px; border-radius: 15px; margin-bottom: 25px;">
-                    <?= $hata ?>
-                </div>
-            <?php endif; ?>
-
-            <form method="POST">
-                <div class="login-input-group">
-                    <input type="password" name="password" placeholder="ŞİFRE" required>
-                </div>
-                <button type="submit" name="login" class="login-btn">GİRİŞ</button>
-            </form>
-
-            <div style="text-align: center; margin-top: 25px; color: var(--joker-light);">
-                Şifre: @ngbwayfite
-            </div>
-        </div>
-    </div>
-
-    <?php else: ?>
-    <!-- DASHBOARD -->
-    <div class="dashboard">
-        <div class="header">
-            <h1>
-                <i class="fas fa-crown"></i>
-                NGB SORGU PANELİM.IO
-            </h1>
-            <div style="display: flex; gap: 20px;">
-                <div class="badge">PRO</div>
-                <a href="?logout=1" class="logout-btn">ÇIKIŞ</a>
-            </div>
-        </div>
-
-        <!-- Kategoriler -->
-        <div class="grid">
-            <div class="card" onclick="setCategory('tc')">
-                <div class="card-icon"><i class="fas fa-id-card"></i></div>
-                <h3>TC</h3>
-            </div>
-            <div class="card" onclick="setCategory('gsm')">
-                <div class="card-icon"><i class="fas fa-mobile-alt"></i></div>
-                <h3>GSM</h3>
-            </div>
-            <div class="card" onclick="setCategory('isim')">
-                <div class="card-icon"><i class="fas fa-user"></i></div>
-                <h3>İSİM</h3>
-            </div>
-            <div class="card" onclick="setCategory('aile')">
-                <div class="card-icon"><i class="fas fa-users"></i></div>
-                <h3>AİLE</h3>
-            </div>
-            <div class="card" onclick="setCategory('adres')">
-                <div class="card-icon"><i class="fas fa-map-marker-alt"></i></div>
-                <h3>ADRES</h3>
-            </div>
-            <div class="card" onclick="setCategory('is')">
-                <div class="card-icon"><i class="fas fa-briefcase"></i></div>
-                <h3>İŞ</h3>
-            </div>
-            <div class="card" onclick="setCategory('finans')">
-                <div class="card-icon"><i class="fas fa-coins"></i></div>
-                <h3>FİNANS</h3>
-            </div>
-            <div class="card" onclick="setCategory('sosyal')">
-                <div class="card-icon"><i class="fas fa-globe"></i></div>
-                <h3>SOSYAL</h3>
-            </div>
-            <div class="card" onclick="setCategory('egitim')">
                 <div class="card-icon"><i class="fas fa-graduation-cap"></i></div>
                 <h3>EĞİTİM</h3>
             </div>
         </div>
-
+        
         <!-- Sorgu -->
         <div class="query-box">
             <div class="query-header">
@@ -797,24 +709,24 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
                 <h2 id="queryTitle">TC Sorgulama</h2>
                 <div class="badge" id="queryBadge">tc</div>
             </div>
-
+            
             <div class="input-group">
                 <input type="text" id="queryParam" placeholder="Parametre..." onkeypress="if(event.key==='Enter') executeQuery()">
                 <button onclick="executeQuery()" id="queryBtn">
                     <i class="fas fa-search"></i> SORGULA
                 </button>
             </div>
-
+            
             <div class="example" id="queryExample">
-                <i class="fas fa-info-circle"></i> Örnek: 12345678901
+                <i class="fas fa-info-circle"></i> Örnek: 11111111110
             </div>
-
+            
             <!-- Loader -->
             <div class="loader" id="queryLoader">
                 <div class="spinner"></div>
-                <p style="color: white;">Sorgulanıyor...</p>
+                <p>Sorgulanıyor...</p>
             </div>
-
+            
             <!-- Sonuç -->
             <div class="result" id="resultContainer">
                 <div class="result-header">
@@ -827,7 +739,7 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
                 <div class="result-content" id="resultContent"></div>
             </div>
         </div>
-
+        
         <!-- Son Sorgular -->
         <div class="recent">
             <div class="recent-header">
@@ -839,42 +751,34 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
     </div>
 
     <script>
-        // API'ler (Güncellendi)
+        // API'ler
         const apiList = {
             // TC Kategorisi
             'tc': { name: 'TC Sorgulama', icon: 'fa-id-card', example: '11111111110', badge: 'tc', category: 'tc', proxyType: 'tc', params: ['tc'] },
             'tcpro': { name: 'TC Profesyonel', icon: 'fa-id-card', example: '11111111110', badge: 'tcpro', category: 'tc', proxyType: 'tcpro', params: ['tc'] },
-
             // İSİM Kategorisi
             'adsoyad': { name: 'İsim-Soyisim', icon: 'fa-user', example: 'roket atar', badge: 'adsoyad', category: 'isim', proxyType: 'adsoyad', params: ['ad', 'soyad'] },
             'adsoyadpro': { name: 'İsim-Soyisim-İl', icon: 'fa-user', example: 'roket atar bursa', badge: 'adsoyadpro', category: 'isim', proxyType: 'adsoyadpro', params: ['ad', 'soyad', 'il'] },
             'adililce': { name: 'İsim-İl', icon: 'fa-user', example: 'roket bursa', badge: 'adililce', category: 'isim', proxyType: 'adililce', params: ['ad', 'il'] },
-
             // AİLE Kategorisi
             'aile': { name: 'Aile (TC)', icon: 'fa-users', example: '11111111110', badge: 'aile', category: 'aile', proxyType: 'aile', params: ['tc'] },
             'ailepro': { name: 'Aile Pro (TC)', icon: 'fa-users', example: '11111111110', badge: 'ailepro', category: 'aile', proxyType: 'ailepro', params: ['tc'] },
             'sulale': { name: 'Sülale (TC)', icon: 'fa-tree', example: '11111111110', badge: 'sulale', category: 'aile', proxyType: 'sulale', params: ['tc'] },
             'soyagaci': { name: 'Soy Ağacı (TC)', icon: 'fa-tree', example: '11111111110', badge: 'soyagaci', category: 'aile', proxyType: 'soyagaci', params: ['tc'] },
-
             // ADRES Kategorisi
             'adres': { name: 'Adres (TC)', icon: 'fa-map-marker-alt', example: '11111111110', badge: 'adres', category: 'adres', proxyType: 'adres', params: ['tc'] },
             'adrespro': { name: 'Adres Pro (TC)', icon: 'fa-map-marker-alt', example: '11144576054', badge: 'adrespro', category: 'adres', proxyType: 'adrespro', params: ['tc'] },
-
             // İŞ Kategorisi
             'isyeri': { name: 'İş Yeri (TC)', icon: 'fa-briefcase', example: '11144576054', badge: 'isyeri', category: 'is', proxyType: 'isyeri', params: ['tc'] },
             'isyeriark': { name: 'İş Arkadaşları (TC)', icon: 'fa-users', example: '11144576054', badge: 'isyeriark', category: 'is', proxyType: 'isyeriark', params: ['tc'] },
-
             // GSM Kategorisi
             'gncloperator': { name: 'Güncel Operatör', icon: 'fa-mobile-alt', example: '5415722525', badge: 'gncloperator', category: 'gsm', proxyType: 'gncloperator', params: ['numara'] },
             'tcgsm': { name: 'TC>GSM', icon: 'fa-mobile-alt', example: '11111111110', badge: 'tcgsm', category: 'gsm', proxyType: 'tcgsm', params: ['tc'] },
             'gsmtc': { name: 'GSM>TC', icon: 'fa-mobile-alt', example: '5415722525', badge: 'gsmtc', category: 'gsm', proxyType: 'gsmtc', params: ['gsm'] },
-
             // FİNANS Kategorisi
             'iban': { name: 'IBAN Sorgulama', icon: 'fa-coins', example: 'TR200006283386172945624672', badge: 'iban', category: 'finans', proxyType: 'iban', params: ['iban'] },
-
             // SOSYAL Kategorisi
             'tg': { name: 'Telegram Sorgu', icon: 'fa-telegram', example: 'SanalMeclis', badge: 'tg', category: 'sosyal', proxyType: 'tg', params: ['username'] },
-
             // EĞİTİM Kategorisi
             'okulno': { name: 'Okul No (TC)', icon: 'fa-graduation-cap', example: '22121212070', badge: 'okulno', category: 'egitim', proxyType: 'okulno', params: ['tc'] }
         };
@@ -915,15 +819,13 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
             document.getElementById('resultContainer').style.display = 'none';
             document.getElementById('queryBtn').disabled = true;
 
-            // Daha uzun timeout (API'ler 10 saniye bekletebiliyor)
             const timeout = setTimeout(() => {
                 document.getElementById('queryLoader').style.display = 'none';
                 document.getElementById('queryBtn').disabled = false;
                 alert('Zaman aşımı! Lütfen tekrar deneyin.');
-            }, 30000); // 30 saniye
+            }, 30000);
 
             try {
-                // Proxy'ye sadece tip ve ham parametreyi gönder
                 const response = await fetch(`proxy.php?type=${api.proxyType}&param=${encodeURIComponent(param)}`);
                 clearTimeout(timeout);
 
@@ -938,11 +840,9 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
 
                 if (data.success) {
                     const resultContent = document.getElementById('resultContent');
-                    // Proxy'den gelen veri artık temizlenmiş halde (data.data içinde)
                     const resultStr = JSON.stringify(data.data, null, 2);
                     resultContent.textContent = resultStr;
 
-                    // Veri boyutuna göre stillendirme
                     if (resultStr.length < 1000) {
                         resultContent.classList.add('small');
                     } else {
@@ -951,7 +851,6 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
 
                     document.getElementById('resultContainer').style.display = 'block';
 
-                    // Son sorgulara ekle
                     recentQueries.unshift({
                         type: api.name,
                         param: param,
@@ -1010,16 +909,13 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
             `).join('');
         }
 
-        // Son sorguya tıklandığında parametreyi inputa koy ve sorguyu çalıştır
         function recentQueryClick(param, typeName) {
-             // Tip ismine göre type key'ini bul (tam eşleme için daha karmaşık yapılabilir, şimdilik basit)
              const foundType = Object.keys(apiList).find(key => apiList[key].name === typeName);
              if (foundType) {
                  setType(foundType);
                  document.getElementById('queryParam').value = param;
                  executeQuery();
              } else {
-                 // Eski kayıtlar için tip bulunamazsa sadece inputa yaz
                  document.getElementById('queryParam').value = param;
                  alert('Tip bilgisi bulunamadı, parametre inputa yazıldı.');
              }
@@ -1033,7 +929,6 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
             }
         }
 
-        // Sayfa yüklendiğinde
         document.addEventListener('DOMContentLoaded', () => {
             setType('tc');
             loadRecent();
