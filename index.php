@@ -3,14 +3,13 @@ session_start();
 
 // =============================================
 // NGB SORGU PANELİM.IO - JOKER ULTIMATE PANEL
-// TÜM ÖZELLİKLER AKTİF - REKLAM TEMİZLEME AKTİF
-// TELEGRAM ENTEGRASYONU - GİRİŞ KAYITLARI
+// OPTİMİZE EDİLMİŞ - AKICI ANİMASYONLAR
 // Şifre: @ngbwayfite
 // =============================================
 
 define('SIFRE', '@ngbwayfite');
 define('BOT_TOKEN', '8588404115:AAG7BD9FebTCIy-3VR7h4byCidwDcrIZXWw');
-define('CHAT_ID', '8444268448'); // Logların gideceği chat ID
+define('CHAT_ID', '8444268448');
 
 // Logout
 if (isset($_GET['logout'])) {
@@ -24,7 +23,6 @@ if (isset($_POST['login'])) {
     if ($_POST['password'] === SIFRE) {
         $_SESSION['loggedin'] = true;
         
-        // Giriş kaydını Telegram'a gönder
         $ip = $_SERVER['REMOTE_ADDR'];
         $user_agent = $_SERVER['HTTP_USER_AGENT'];
         $tarih = date('Y-m-d H:i:s');
@@ -35,11 +33,10 @@ if (isset($_POST['login'])) {
         $mesaj .= "📱 *Cihaz:* $user_agent\n";
         $mesaj .= "🕒 *Tarih:* $tarih\n";
         
-        file_get_contents("https://api.telegram.org/bot" . BOT_TOKEN . "/sendMessage?chat_id=" . CHAT_ID . "&text=" . urlencode($mesaj) . "&parse_mode=Markdown");
+        @file_get_contents("https://api.telegram.org/bot" . BOT_TOKEN . "/sendMessage?chat_id=" . CHAT_ID . "&text=" . urlencode($mesaj) . "&parse_mode=Markdown");
     } else {
         $hata = "Hatalı şifre!";
         
-        // Başarısız giriş denemesini kaydet
         $ip = $_SERVER['REMOTE_ADDR'];
         $tarih = date('Y-m-d H:i:s');
         
@@ -47,7 +44,7 @@ if (isset($_POST['login'])) {
         $mesaj .= "🌐 *IP:* `$ip`\n";
         $mesaj .= "🕒 *Tarih:* $tarih\n";
         
-        file_get_contents("https://api.telegram.org/bot" . BOT_TOKEN . "/sendMessage?chat_id=" . CHAT_ID . "&text=" . urlencode($mesaj) . "&parse_mode=Markdown");
+        @file_get_contents("https://api.telegram.org/bot" . BOT_TOKEN . "/sendMessage?chat_id=" . CHAT_ID . "&text=" . urlencode($mesaj) . "&parse_mode=Markdown");
     }
 }
 
@@ -64,9 +61,8 @@ if (isset($_POST['sorgu_kaydet']) && isset($_SESSION['loggedin']) && $_SESSION['
     $mesaj .= "🔎 *Parametre:* `$sorgu_parametre`\n";
     $mesaj .= "🌐 *IP:* `$ip`\n";
     $mesaj .= "🕒 *Tarih:* $tarih\n";
-    $mesaj .= "📊 *Sonuç:* \n```" . substr($sonuc, 0, 500) . "```";
     
-    file_get_contents("https://api.telegram.org/bot" . BOT_TOKEN . "/sendMessage?chat_id=" . CHAT_ID . "&text=" . urlencode($mesaj) . "&parse_mode=Markdown");
+    @file_get_contents("https://api.telegram.org/bot" . BOT_TOKEN . "/sendMessage?chat_id=" . CHAT_ID . "&text=" . urlencode($mesaj) . "&parse_mode=Markdown");
     
     echo json_encode(['success' => true]);
     exit;
@@ -79,7 +75,7 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NGB SORGU PANELİM.IO | JOKER ULTIMATE PANEL</title>
+    <title>NGB SORGU PANELİ | JOKER ULTIMATE</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -92,96 +88,137 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
         :root {
             --joker-purple: #8b5cf6;
             --joker-dark: #2e1065;
-            --joker-darker: #1e0b36;
+            --joker-darker: #1a0b2e;
             --joker-light: #c4b5fd;
             --joker-glow: #a78bfa;
             --joker-green: #10b981;
             --joker-red: #ef4444;
-            --joker-yellow: #f59e0b;
-            --joker-blue: #3b82f6;
+            --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-medium: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         body {
             font-family: 'Orbitron', sans-serif;
-            background: linear-gradient(135deg, #000, var(--joker-darker), var(--joker-dark));
+            background: linear-gradient(135deg, #000000, var(--joker-darker), var(--joker-dark));
             min-height: 100vh;
             overflow-x: hidden;
             position: relative;
-            animation: bgPulse 15s ease-in-out infinite;
         }
 
-        @keyframes bgPulse {
-            0%, 100% { background-size: 100% 100%; }
-            50% { background-size: 150% 150%; }
+        /* Optimized Background Effects */
+        .bg-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 50%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(196, 181, 253, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+            animation: bgShift 20s ease-in-out infinite alternate;
         }
 
-        /* Floating Cards with Enhanced Animation */
+        @keyframes bgShift {
+            0% { transform: scale(1); opacity: 0.5; }
+            100% { transform: scale(1.2); opacity: 1; }
+        }
+
+        /* Floating Cards - Optimized */
         .floating-card {
             position: fixed;
-            font-size: 80px;
+            font-size: 60px;
             color: var(--joker-purple);
-            opacity: 0.1;
+            opacity: 0.05;
             pointer-events: none;
-            z-index: 1;
-            animation: float 20s ease-in-out infinite;
-            filter: drop-shadow(0 0 30px var(--joker-glow));
+            z-index: 0;
+            animation: float 25s ease-in-out infinite;
+            transform: translateZ(0);
+            will-change: transform;
         }
 
         @keyframes float {
             0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
-            25% { transform: translateY(-100px) rotate(10deg) scale(1.1); }
-            50% { transform: translateY(-200px) rotate(20deg) scale(1.2); }
-            75% { transform: translateY(-100px) rotate(10deg) scale(1.1); }
+            33% { transform: translateY(-50px) rotate(5deg) scale(1.1); }
+            66% { transform: translateY(-30px) rotate(-5deg) scale(0.95); }
         }
 
-        .card1 { top: 5%; left: 5%; animation-delay: 0s; }
-        .card2 { top: 15%; right: 10%; animation-delay: 3s; }
-        .card3 { bottom: 10%; left: 15%; animation-delay: 6s; }
-        .card4 { bottom: 20%; right: 20%; animation-delay: 9s; }
-        .card5 { top: 50%; left: 50%; animation-delay: 12s; }
-        .card6 { top: 30%; left: 30%; animation-delay: 15s; }
-        .card7 { bottom: 40%; right: 40%; animation-delay: 18s; }
+        .card1 { top: 10%; left: 5%; animation-delay: 0s; }
+        .card2 { top: 20%; right: 10%; animation-delay: 5s; }
+        .card3 { bottom: 15%; left: 15%; animation-delay: 10s; }
+        .card4 { bottom: 25%; right: 20%; animation-delay: 15s; }
+        .card5 { top: 50%; left: 50%; animation-delay: 20s; }
 
-        /* Particle Background */
+        /* Particles - Optimized with transform3d */
         .particle {
             position: fixed;
-            width: 4px;
-            height: 4px;
+            width: 2px;
+            height: 2px;
             background: var(--joker-light);
             border-radius: 50%;
             pointer-events: none;
             z-index: 0;
-            animation: particle 15s linear infinite;
-            opacity: 0.3;
+            opacity: 0.2;
+            animation: particle 20s linear infinite;
+            transform: translate3d(0, 0, 0);
+            will-change: transform;
         }
 
         @keyframes particle {
-            0% { transform: translateY(100vh) translateX(0) scale(1); opacity: 0; }
-            10% { opacity: 0.8; transform: scale(1.5); }
-            90% { opacity: 0.8; transform: scale(1.5); }
-            100% { transform: translateY(-100vh) translateX(200px) scale(0); opacity: 0; }
+            0% { transform: translate3d(0, 100vh, 0) scale(1); opacity: 0; }
+            10% { opacity: 0.5; }
+            90% { opacity: 0.5; }
+            100% { transform: translate3d(100px, -100vh, 0) scale(0); opacity: 0; }
         }
 
-        /* Hamburger Menu */
+        /* Glow Effect */
+        @keyframes glow {
+            0% { filter: drop-shadow(0 0 5px var(--joker-purple)); }
+            50% { filter: drop-shadow(0 0 25px var(--joker-light)); }
+            100% { filter: drop-shadow(0 0 5px var(--joker-purple)); }
+        }
+
+        /* Pulse Effect */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        /* Slide In */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translate3d(0, 30px, 0);
+            }
+            to {
+                opacity: 1;
+                transform: translate3d(0, 0, 0);
+            }
+        }
+
+        /* Hamburger Menu - Optimized */
         .menu-toggle {
             position: fixed;
             top: 30px;
             left: 30px;
-            width: 60px;
-            height: 60px;
+            width: 50px;
+            height: 50px;
             background: linear-gradient(135deg, var(--joker-purple), var(--joker-light));
-            border-radius: 20px;
+            border-radius: 15px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             cursor: pointer;
             z-index: 1000;
-            border: 2px solid white;
+            border: 2px solid rgba(255,255,255,0.3);
             box-shadow: 0 0 30px var(--joker-glow);
-            animation: pulse 2s ease-in-out infinite;
-            transition: all 0.3s;
+            transition: var(--transition-medium);
+            transform: translateZ(0);
+            will-change: transform;
         }
 
         .menu-toggle:hover {
@@ -189,40 +226,45 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
         }
 
         .menu-toggle span {
-            width: 30px;
-            height: 4px;
+            width: 25px;
+            height: 3px;
             background: white;
-            border-radius: 4px;
-            transition: all 0.3s;
+            border-radius: 3px;
+            transition: var(--transition-medium);
+            transform: translateZ(0);
         }
 
         .menu-toggle.active span:nth-child(1) {
-            transform: rotate(45deg) translate(8px, 8px);
+            transform: rotate(45deg) translate(6px, 6px);
         }
 
         .menu-toggle.active span:nth-child(2) {
             opacity: 0;
+            transform: scale(0);
         }
 
         .menu-toggle.active span:nth-child(3) {
-            transform: rotate(-45deg) translate(8px, -8px);
+            transform: rotate(-45deg) translate(6px, -6px);
         }
 
-        /* Side Menu */
+        /* Side Menu - Optimized */
         .side-menu {
             position: fixed;
             top: 0;
-            left: -400px;
-            width: 350px;
+            left: -350px;
+            width: 320px;
             height: 100vh;
-            background: rgba(46, 16, 101, 0.98);
-            backdrop-filter: blur(20px);
+            background: rgba(26, 11, 46, 0.98);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             z-index: 999;
-            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            border-right: 3px solid var(--joker-purple);
-            box-shadow: 0 0 50px var(--joker-glow);
+            transition: left var(--transition-slow);
+            border-right: 2px solid var(--joker-purple);
+            box-shadow: 0 0 40px var(--joker-glow);
             overflow-y: auto;
-            padding: 100px 20px 30px;
+            padding: 90px 20px 30px;
+            transform: translateZ(0);
+            will-change: left;
         }
 
         .side-menu.active {
@@ -234,95 +276,78 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
             margin-bottom: 30px;
             padding-bottom: 20px;
             border-bottom: 2px solid var(--joker-purple);
+            animation: slideIn 0.5s ease-out;
         }
 
         .menu-header i {
-            font-size: 60px;
+            font-size: 50px;
             color: var(--joker-light);
-            animation: pulse 2s ease-in-out infinite;
+            animation: pulse 3s ease-in-out infinite;
         }
 
         .menu-header h2 {
             color: white;
-            font-size: 24px;
-            margin-top: 15px;
+            font-size: 20px;
+            margin-top: 10px;
         }
 
         .menu-category {
             margin-bottom: 25px;
+            animation: slideIn 0.5s ease-out;
+            animation-fill-mode: both;
         }
+
+        .menu-category:nth-child(2) { animation-delay: 0.1s; }
+        .menu-category:nth-child(3) { animation-delay: 0.2s; }
+        .menu-category:nth-child(4) { animation-delay: 0.3s; }
+        .menu-category:nth-child(5) { animation-delay: 0.4s; }
+        .menu-category:nth-child(6) { animation-delay: 0.5s; }
+        .menu-category:nth-child(7) { animation-delay: 0.6s; }
 
         .menu-category-title {
             color: var(--joker-light);
-            font-size: 18px;
+            font-size: 14px;
             font-weight: 700;
-            margin-bottom: 15px;
-            padding-left: 15px;
-            border-left: 4px solid var(--joker-purple);
-            animation: glow 2s ease-in-out infinite;
+            margin-bottom: 12px;
+            padding-left: 10px;
+            border-left: 3px solid var(--joker-purple);
+            letter-spacing: 1px;
         }
 
         .menu-items {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
+            gap: 8px;
         }
 
         .menu-item {
-            background: rgba(255,255,255,0.05);
-            border: 2px solid var(--joker-purple);
-            border-radius: 15px;
-            padding: 12px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--joker-purple);
+            border-radius: 12px;
+            padding: 10px 5px;
             color: white;
             text-align: center;
             cursor: pointer;
-            transition: all 0.3s;
-            font-size: 12px;
+            transition: var(--transition-fast);
+            font-size: 11px;
             font-weight: 600;
-            animation: slideIn 0.5s ease-out;
+            transform: translateZ(0);
+            will-change: transform;
         }
 
         .menu-item:hover {
             background: linear-gradient(135deg, var(--joker-purple), var(--joker-light));
-            transform: translateY(-5px) scale(1.05);
+            transform: translateY(-3px) scale(1.02);
             box-shadow: 0 10px 20px rgba(139,92,246,0.3);
         }
 
         .menu-item i {
             display: block;
-            font-size: 20px;
-            margin-bottom: 5px;
+            font-size: 18px;
+            margin-bottom: 4px;
         }
 
-        @keyframes glow {
-            0% { filter: drop-shadow(0 0 5px var(--joker-purple)); }
-            50% { filter: drop-shadow(0 0 40px var(--joker-light)); }
-            100% { filter: drop-shadow(0 0 5px var(--joker-purple)); }
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); box-shadow: 0 0 30px var(--joker-purple); }
-            50% { transform: scale(1.05); box-shadow: 0 0 60px var(--joker-glow); }
-            100% { transform: scale(1); box-shadow: 0 0 30px var(--joker-purple); }
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        /* Login */
+        /* Login - Optimized */
         .login-wrapper {
             min-height: 100vh;
             display: flex;
@@ -331,161 +356,124 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
             padding: 20px;
             position: relative;
             z-index: 10;
-            animation: slideIn 1s ease-out;
+            animation: slideIn 0.8s ease-out;
         }
 
         .login-card {
-            background: rgba(46, 16, 101, 0.98);
-            backdrop-filter: blur(20px);
-            border-radius: 60px;
-            padding: 70px 60px;
+            background: rgba(26, 11, 46, 0.98);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 40px;
+            padding: 50px 40px;
             width: 100%;
-            max-width: 550px;
-            border: 3px solid var(--joker-purple);
-            box-shadow: 0 0 100px var(--joker-glow);
-            animation: glow 3s ease-in-out infinite, pulse 3s ease-in-out infinite;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .login-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(
-                45deg,
-                transparent,
-                rgba(139, 92, 246, 0.1),
-                transparent
-            );
-            animation: rotate 15s linear infinite;
+            max-width: 450px;
+            border: 2px solid var(--joker-purple);
+            box-shadow: 0 0 60px var(--joker-glow);
+            animation: glow 3s ease-in-out infinite;
+            transform: translateZ(0);
+            will-change: box-shadow;
         }
 
         .login-logo {
             text-align: center;
-            margin-bottom: 50px;
-            position: relative;
-            z-index: 1;
+            margin-bottom: 40px;
         }
 
         .login-logo i {
-            font-size: 120px;
+            font-size: 80px;
             color: var(--joker-light);
-            animation: pulse 2s ease-in-out infinite, glow 2s ease-in-out infinite;
+            animation: pulse 2s ease-in-out infinite;
         }
 
         .login-logo h1 {
-            font-size: 52px;
+            font-size: 36px;
             color: white;
-            text-shadow: 0 0 40px var(--joker-purple);
-            margin: 20px 0;
-            animation: glow 2s ease-in-out infinite;
+            text-shadow: 0 0 30px var(--joker-purple);
+            margin: 15px 0;
         }
 
         .login-logo p {
             color: var(--joker-light);
-            font-size: 16px;
-            letter-spacing: 4px;
+            font-size: 13px;
+            letter-spacing: 2px;
         }
 
         .login-input-group {
-            margin-bottom: 30px;
-            position: relative;
-            z-index: 1;
+            margin-bottom: 25px;
         }
 
         .login-input-group input {
             width: 100%;
-            padding: 20px 30px;
-            background: rgba(255,255,255,0.1);
-            border: 3px solid var(--joker-purple);
-            border-radius: 40px;
+            padding: 16px 25px;
+            background: rgba(255,255,255,0.05);
+            border: 2px solid var(--joker-purple);
+            border-radius: 30px;
             color: white;
-            font-size: 18px;
+            font-size: 15px;
             font-family: 'Orbitron', sans-serif;
-            transition: all 0.3s;
+            transition: var(--transition-fast);
+            transform: translateZ(0);
         }
 
         .login-input-group input:focus {
             outline: none;
             border-color: var(--joker-light);
-            box-shadow: 0 0 60px var(--joker-glow);
-            transform: scale(1.02);
-        }
-
-        .login-input-group input::placeholder {
-            color: rgba(255,255,255,0.5);
+            box-shadow: 0 0 40px var(--joker-glow);
+            transform: scale(1.01);
         }
 
         .login-btn {
             width: 100%;
-            padding: 20px;
+            padding: 16px;
             background: linear-gradient(135deg, var(--joker-purple), var(--joker-light));
             border: none;
-            border-radius: 40px;
+            border-radius: 30px;
             color: white;
-            font-size: 20px;
-            font-weight: 800;
+            font-size: 16px;
+            font-weight: 700;
             cursor: pointer;
             text-transform: uppercase;
-            letter-spacing: 3px;
-            animation: pulse 2s ease-in-out infinite;
+            letter-spacing: 2px;
+            transition: var(--transition-fast);
             font-family: 'Orbitron', sans-serif;
-            position: relative;
-            z-index: 1;
-            overflow: hidden;
-        }
-
-        .login-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s;
-        }
-
-        .login-btn:hover::before {
-            left: 100%;
+            transform: translateZ(0);
+            will-change: transform;
         }
 
         .login-btn:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 30px 60px rgba(139, 92, 246, 0.5);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(139, 92, 246, 0.4);
         }
 
-        /* Dashboard */
+        /* Dashboard - Optimized */
         .dashboard {
-            padding: 30px 30px 30px 100px;
+            padding: 30px 30px 30px 90px;
             position: relative;
             z-index: 10;
         }
 
         .header {
-            background: rgba(46, 16, 101, 0.98);
-            backdrop-filter: blur(20px);
-            border-radius: 50px;
-            padding: 25px 40px;
-            margin-bottom: 30px;
+            background: rgba(26, 11, 46, 0.98);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 20px 30px;
+            margin-bottom: 25px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border: 3px solid var(--joker-purple);
-            box-shadow: 0 0 60px var(--joker-glow);
+            border: 2px solid var(--joker-purple);
+            box-shadow: 0 0 40px var(--joker-glow);
             animation: slideIn 0.5s ease-out;
+            transform: translateZ(0);
         }
 
         .header h1 {
             color: white;
-            font-size: 36px;
+            font-size: 28px;
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 15px;
         }
 
         .header h1 i {
@@ -495,240 +483,208 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
 
         .badge {
             background: linear-gradient(135deg, var(--joker-purple), var(--joker-light));
-            padding: 12px 30px;
-            border-radius: 50px;
+            padding: 8px 20px;
+            border-radius: 30px;
             color: white;
-            font-weight: 700;
-            font-size: 16px;
-            animation: glow 2s ease-in-out infinite;
+            font-weight: 600;
+            font-size: 13px;
+            letter-spacing: 1px;
         }
 
         .logout-btn {
-            background: rgba(239, 68, 68, 0.3);
+            background: rgba(239, 68, 68, 0.2);
             color: white;
-            border: 2px solid #ef4444;
-            padding: 12px 30px;
-            border-radius: 50px;
+            border: 1px solid #ef4444;
+            padding: 8px 20px;
+            border-radius: 30px;
             text-decoration: none;
-            transition: all 0.3s;
-            font-size: 16px;
+            transition: var(--transition-fast);
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .logout-btn:hover {
             background: #ef4444;
-            transform: translateY(-5px) scale(1.05);
-            box-shadow: 0 15px 30px rgba(239,68,68,0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(239,68,68,0.3);
         }
 
-        /* Cards */
+        /* Cards Grid - Optimized */
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 25px;
-            margin-bottom: 30px;
-            animation: slideIn 0.7s ease-out;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
         }
 
         .card {
-            background: rgba(46, 16, 101, 0.95);
-            backdrop-filter: blur(15px);
-            border-radius: 35px;
-            padding: 30px 20px;
-            border: 3px solid var(--joker-purple);
-            transition: all 0.3s;
+            background: rgba(26, 11, 46, 0.95);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border-radius: 25px;
+            padding: 20px 15px;
+            border: 2px solid var(--joker-purple);
             cursor: pointer;
             text-align: center;
-            animation: slideIn 0.8s ease-out;
-            position: relative;
-            overflow: hidden;
+            transition: var(--transition-fast);
+            animation: slideIn 0.5s ease-out;
+            animation-fill-mode: both;
+            transform: translateZ(0);
+            will-change: transform;
         }
 
-        .card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(
-                45deg,
-                transparent,
-                rgba(139, 92, 246, 0.2),
-                transparent
-            );
-            transition: all 0.5s;
-        }
-
-        .card:hover::before {
-            transform: rotate(180deg);
-        }
+        .card:nth-child(1) { animation-delay: 0.05s; }
+        .card:nth-child(2) { animation-delay: 0.1s; }
+        .card:nth-child(3) { animation-delay: 0.15s; }
+        .card:nth-child(4) { animation-delay: 0.2s; }
+        .card:nth-child(5) { animation-delay: 0.25s; }
+        .card:nth-child(6) { animation-delay: 0.3s; }
+        .card:nth-child(7) { animation-delay: 0.35s; }
 
         .card:hover {
-            transform: translateY(-15px) scale(1.05);
+            transform: translateY(-8px) scale(1.02);
             border-color: var(--joker-light);
-            box-shadow: 0 30px 60px rgba(139, 92, 246, 0.5);
+            box-shadow: 0 20px 40px rgba(139, 92, 246, 0.3);
         }
 
         .card-icon {
-            width: 70px;
-            height: 70px;
+            width: 50px;
+            height: 50px;
             background: linear-gradient(135deg, var(--joker-purple), var(--joker-light));
-            border-radius: 25px;
+            border-radius: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 20px;
-            animation: pulse 3s ease-in-out infinite;
+            margin: 0 auto 12px;
         }
 
         .card-icon i {
-            font-size: 32px;
+            font-size: 24px;
             color: white;
         }
 
         .card h3 {
             color: white;
-            font-size: 16px;
-            font-weight: 700;
+            font-size: 13px;
+            font-weight: 600;
         }
 
-        /* Query */
+        /* Query Box - Optimized */
         .query-box {
-            background: rgba(46, 16, 101, 0.98);
-            backdrop-filter: blur(20px);
-            border-radius: 50px;
-            padding: 40px;
-            margin-bottom: 30px;
-            border: 3px solid var(--joker-purple);
-            animation: slideIn 0.9s ease-out;
+            background: rgba(26, 11, 46, 0.98);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 30px;
+            margin-bottom: 25px;
+            border: 2px solid var(--joker-purple);
+            animation: slideIn 0.6s ease-out;
+            transform: translateZ(0);
         }
 
         .query-header {
             display: flex;
             align-items: center;
-            gap: 25px;
-            margin-bottom: 30px;
-            padding-bottom: 25px;
-            border-bottom: 3px solid var(--joker-purple);
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--joker-purple);
         }
 
         .query-header i {
-            font-size: 60px;
+            font-size: 40px;
             color: var(--joker-light);
-            animation: pulse 2s ease-in-out infinite, glow 2s ease-in-out infinite;
+            animation: pulse 2s ease-in-out infinite;
         }
 
         .query-header h2 {
             color: white;
-            font-size: 32px;
+            font-size: 22px;
             font-weight: 700;
         }
 
         .input-group {
             display: flex;
-            gap: 20px;
-            margin-bottom: 20px;
+            gap: 12px;
+            margin-bottom: 12px;
         }
 
         .input-group input {
             flex: 1;
-            padding: 22px 35px;
-            background: rgba(255,255,255,0.1);
-            border: 3px solid var(--joker-purple);
-            border-radius: 40px;
+            padding: 16px 25px;
+            background: rgba(255,255,255,0.05);
+            border: 2px solid var(--joker-purple);
+            border-radius: 25px;
             color: white;
-            font-size: 18px;
+            font-size: 15px;
             font-family: 'Orbitron', sans-serif;
-            transition: all 0.3s;
+            transition: var(--transition-fast);
+            transform: translateZ(0);
         }
 
         .input-group input:focus {
             outline: none;
             border-color: var(--joker-light);
-            box-shadow: 0 0 60px var(--joker-glow);
-            transform: scale(1.02);
-        }
-
-        .input-group input::placeholder {
-            color: rgba(255,255,255,0.5);
+            box-shadow: 0 0 30px var(--joker-glow);
+            transform: scale(1.01);
         }
 
         .input-group button {
-            padding: 22px 50px;
+            padding: 16px 35px;
             background: linear-gradient(135deg, var(--joker-purple), var(--joker-light));
             border: none;
-            border-radius: 40px;
+            border-radius: 25px;
             color: white;
-            font-weight: 800;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: var(--transition-fast);
             font-family: 'Orbitron', sans-serif;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            font-size: 18px;
-            position: relative;
-            overflow: hidden;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transform: translateZ(0);
+            will-change: transform;
         }
 
-        .input-group button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s;
-        }
-
-        .input-group button:hover::before {
-            left: 100%;
-        }
-
-        .input-group button:hover {
-            transform: translateY(-5px) scale(1.05);
-            box-shadow: 0 30px 60px rgba(139, 92, 246, 0.5);
+        .input-group button:hover:not(:disabled) {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(139, 92, 246, 0.4);
         }
 
         .input-group button:disabled {
             opacity: 0.5;
             cursor: not-allowed;
-            transform: none;
         }
 
         .example {
             color: var(--joker-light);
-            font-size: 16px;
+            font-size: 13px;
             display: flex;
             align-items: center;
-            gap: 10px;
-            animation: glow 2s ease-in-out infinite;
+            gap: 8px;
+            opacity: 0.8;
         }
 
-        /* Loader */
+        /* Loader - Optimized */
         .loader {
             display: none;
             text-align: center;
-            padding: 50px;
+            padding: 30px;
         }
 
         .spinner {
-            width: 70px;
-            height: 70px;
-            border: 5px solid var(--joker-purple);
+            width: 50px;
+            height: 50px;
+            border: 3px solid var(--joker-purple);
             border-top-color: var(--joker-light);
             border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-
-        .spinner-pulse {
-            width: 100px;
-            height: 100px;
-            background: linear-gradient(135deg, var(--joker-purple), var(--joker-light));
-            border-radius: 50%;
-            margin: 0 auto 20px;
-            animation: pulse 1s ease-in-out infinite;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 12px;
+            transform: translateZ(0);
+            will-change: transform;
         }
 
         @keyframes spin {
@@ -737,178 +693,175 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
 
         .loader p {
             color: white;
-            font-size: 18px;
-            animation: glow 1s ease-in-out infinite;
+            font-size: 14px;
+            animation: pulse 1.5s ease-in-out infinite;
         }
 
-        /* Result */
+        /* Result - Optimized */
         .result {
-            background: rgba(0,0,0,0.4);
-            border-radius: 40px;
-            padding: 30px;
-            margin-top: 30px;
-            border: 3px solid var(--joker-purple);
+            background: rgba(0,0,0,0.3);
+            border-radius: 25px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 2px solid var(--joker-purple);
             display: none;
-            animation: slideIn 0.5s ease-out;
+            animation: slideIn 0.4s ease-out;
+            transform: translateZ(0);
         }
 
         .result-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 12px;
         }
 
         .result-header h3 {
             color: var(--joker-green);
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-size: 20px;
+            gap: 8px;
+            font-size: 16px;
         }
 
         .result-actions {
             display: flex;
-            gap: 15px;
+            gap: 8px;
         }
 
         .result-actions button {
-            padding: 10px 20px;
-            background: rgba(255,255,255,0.1);
-            border: 2px solid var(--joker-purple);
-            border-radius: 20px;
+            padding: 6px 12px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--joker-purple);
+            border-radius: 12px;
             color: white;
             cursor: pointer;
-            transition: all 0.2s;
-            font-size: 16px;
+            transition: var(--transition-fast);
+            font-size: 12px;
+            transform: translateZ(0);
         }
 
         .result-actions button:hover {
             background: var(--joker-purple);
-            transform: scale(1.1) rotate(5deg);
+            transform: scale(1.05);
         }
 
         .result-content {
-            background: rgba(0,0,0,0.6);
-            border-radius: 25px;
-            padding: 30px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 15px;
+            padding: 20px;
             font-family: monospace;
-            font-size: 14px;
+            font-size: 12px;
             color: var(--joker-light);
-            max-height: 600px;
+            max-height: 400px;
             overflow-y: auto;
             white-space: pre-wrap;
             word-break: break-word;
-            border: 2px solid var(--joker-purple);
+            border: 1px solid var(--joker-purple);
         }
 
-        .result-content.small {
-            background: rgba(16, 185, 129, 0.15);
-            border-left: 5px solid var(--joker-green);
-            font-size: 15px;
-        }
-
-        /* Recent */
+        /* Recent - Optimized */
         .recent {
-            background: rgba(46, 16, 101, 0.98);
-            backdrop-filter: blur(20px);
-            border-radius: 50px;
-            padding: 40px;
-            border: 3px solid var(--joker-purple);
-            animation: slideIn 1s ease-out;
+            background: rgba(26, 11, 46, 0.98);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 30px;
+            border: 2px solid var(--joker-purple);
+            animation: slideIn 0.7s ease-out;
+            transform: translateZ(0);
         }
 
         .recent-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
 
         .recent-header h2 {
             color: white;
             display: flex;
             align-items: center;
-            gap: 15px;
-            font-size: 28px;
+            gap: 10px;
+            font-size: 20px;
         }
 
         .clear-btn {
-            padding: 12px 25px;
-            background: rgba(239, 68, 68, 0.3);
-            border: 2px solid #ef4444;
-            border-radius: 30px;
+            padding: 8px 18px;
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid #ef4444;
+            border-radius: 20px;
             color: white;
             cursor: pointer;
             font-family: 'Orbitron', sans-serif;
-            transition: all 0.3s;
-            font-size: 16px;
+            transition: var(--transition-fast);
+            font-size: 12px;
         }
 
         .clear-btn:hover {
             background: #ef4444;
-            transform: scale(1.05) rotate(5deg);
-            box-shadow: 0 15px 30px rgba(239,68,68,0.3);
+            transform: scale(1.02);
         }
 
         .recent-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 12px;
         }
 
         .recent-item {
-            background: rgba(0,0,0,0.4);
-            border-radius: 25px;
-            padding: 20px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 18px;
+            padding: 15px;
             cursor: pointer;
-            transition: all 0.3s;
-            border: 2px solid transparent;
-            animation: slideIn 1.1s ease-out;
+            transition: var(--transition-fast);
+            border: 1px solid transparent;
+            transform: translateZ(0);
+            will-change: transform;
         }
 
         .recent-item:hover {
-            background: rgba(139, 92, 246, 0.3);
-            transform: translateX(15px) scale(1.02);
+            background: rgba(139, 92, 246, 0.2);
+            transform: translateX(8px) scale(1.01);
             border-color: var(--joker-purple);
-            box-shadow: 0 15px 30px rgba(139,92,246,0.3);
         }
 
         .recent-type {
             background: linear-gradient(135deg, var(--joker-purple), var(--joker-light));
             color: white;
-            padding: 6px 18px;
-            border-radius: 30px;
-            font-size: 12px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 10px;
             display: inline-block;
-            margin-bottom: 12px;
-            font-weight: 700;
+            margin-bottom: 8px;
+            font-weight: 600;
         }
 
         .recent-param {
             color: white;
-            font-weight: 700;
-            margin-bottom: 8px;
-            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 13px;
             word-break: break-all;
         }
 
         .recent-time {
-            color: rgba(255,255,255,0.5);
-            font-size: 12px;
+            color: rgba(255,255,255,0.4);
+            font-size: 10px;
         }
 
         /* Responsive */
         @media (max-width: 768px) {
             .dashboard {
-                padding: 30px 20px;
+                padding: 20px;
             }
             
             .menu-toggle {
                 top: 20px;
                 left: 20px;
-                width: 50px;
-                height: 50px;
+                width: 45px;
+                height: 45px;
             }
             
             .side-menu {
@@ -918,13 +871,13 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
             
             .header {
                 flex-direction: column;
-                gap: 20px;
+                gap: 12px;
                 text-align: center;
-                padding: 20px;
+                padding: 15px;
             }
             
             .header h1 {
-                font-size: 24px;
+                font-size: 20px;
             }
             
             .input-group {
@@ -937,22 +890,22 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
             }
             
             .grid {
-                grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+                grid-template-columns: repeat(3, 1fr);
             }
             
             .login-card {
-                padding: 40px 30px;
+                padding: 30px 20px;
             }
             
             .login-logo h1 {
-                font-size: 32px;
+                font-size: 24px;
             }
         }
 
-        /* Scrollbar */
+        /* Scrollbar - Optimized */
         ::-webkit-scrollbar {
-            width: 12px;
-            height: 12px;
+            width: 8px;
+            height: 8px;
         }
 
         ::-webkit-scrollbar-track {
@@ -961,50 +914,45 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
 
         ::-webkit-scrollbar-thumb {
             background: var(--joker-purple);
-            border-radius: 10px;
+            border-radius: 8px;
         }
 
         ::-webkit-scrollbar-thumb:hover {
             background: var(--joker-light);
         }
 
-        /* Success/Error Animations */
-        @keyframes success {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.3); }
-            100% { transform: scale(1); }
-        }
-
+        /* Utility Classes */
         .success-icon {
             color: var(--joker-green);
-            animation: success 0.5s ease-in-out;
+            animation: pulse 1s ease-in-out;
         }
 
         .error-icon {
             color: var(--joker-red);
-            animation: success 0.5s ease-in-out;
+            animation: pulse 1s ease-in-out;
         }
     </style>
 </head>
 <body>
+    <!-- Background Elements -->
+    <div class="bg-gradient"></div>
+    
     <?php
-    // Rastgele partiküller oluştur
-    for ($i = 0; $i < 100; $i++): 
+    // Optimized particles - fewer but smoother
+    for ($i = 0; $i < 30; $i++): 
         $left = rand(0, 100);
-        $delay = rand(0, 30);
-        $duration = rand(10, 25);
-        $size = rand(2, 6);
+        $delay = rand(0, 15);
+        $duration = rand(15, 25);
     ?>
-    <div class="particle" style="left: <?= $left ?>%; animation-delay: <?= $delay ?>s; animation-duration: <?= $duration ?>s; width: <?= $size ?>px; height: <?= $size ?>px;"></div>
+    <div class="particle" style="left: <?= $left ?>%; animation-delay: <?= $delay ?>s; animation-duration: <?= $duration ?>s;"></div>
     <?php endfor; ?>
 
+    <!-- Floating Cards -->
     <div class="floating-card card1">♠</div>
     <div class="floating-card card2">♣</div>
     <div class="floating-card card3">♥</div>
     <div class="floating-card card4">♦</div>
     <div class="floating-card card5">🃏</div>
-    <div class="floating-card card6">♠</div>
-    <div class="floating-card card7">♣</div>
 
     <?php if (!$giris_yapildi): ?>
     <!-- LOGIN -->
@@ -1017,7 +965,7 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
             </div>
             
             <?php if (isset($hata)): ?>
-                <div style="background: rgba(239,68,68,0.3); color: white; padding: 15px; border-radius: 25px; margin-bottom: 25px; text-align: center; animation: slideIn 0.5s ease-out;">
+                <div style="background: rgba(239,68,68,0.2); color: white; padding: 12px; border-radius: 20px; margin-bottom: 20px; text-align: center; font-size: 14px; border: 1px solid #ef4444;">
                     <i class="fas fa-exclamation-triangle error-icon"></i> <?= $hata ?>
                 </div>
             <?php endif; ?>
@@ -1029,14 +977,14 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
                 <button type="submit" name="login" class="login-btn">GİRİŞ</button>
             </form>
             
-            <div style="text-align: center; margin-top: 30px; color: var(--joker-light); font-size: 14px; animation: glow 2s ease-in-out infinite;">
+            <div style="text-align: center; margin-top: 25px; color: var(--joker-light); font-size: 12px; opacity: 0.7;">
                 Şifre: @ngbwayfite
             </div>
         </div>
     </div>
     
     <?php else: ?>
-    <!-- Hamburger Menu Toggle -->
+    <!-- Hamburger Menu -->
     <div class="menu-toggle" id="menuToggle" onclick="toggleMenu()">
         <span></span>
         <span></span>
@@ -1050,18 +998,15 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
             <h2>SORGU MENÜSÜ</h2>
         </div>
         
-        <!-- TC Kategorisi -->
         <div class="menu-category">
             <div class="menu-category-title">🔴 TC SORGULARI</div>
             <div class="menu-items">
                 <div class="menu-item" onclick="setTypeAndClose('tc1')"><i class="fas fa-id-card"></i> TC-1</div>
                 <div class="menu-item" onclick="setTypeAndClose('tc2')"><i class="fas fa-id-card"></i> TC-2</div>
                 <div class="menu-item" onclick="setTypeAndClose('tcgsm')"><i class="fas fa-mobile-alt"></i> TC'den GSM</div>
-                <div class="menu-item" onclick="setTypeAndClose('okulno')"><i class="fas fa-graduation-cap"></i> Okul No</div>
             </div>
         </div>
         
-        <!-- AİLE Kategorisi -->
         <div class="menu-category">
             <div class="menu-category-title">👪 AİLE SORGULARI</div>
             <div class="menu-items">
@@ -1071,7 +1016,6 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
             </div>
         </div>
         
-        <!-- İSİM Kategorisi -->
         <div class="menu-category">
             <div class="menu-category-title">👤 İSİM SORGULARI</div>
             <div class="menu-items">
@@ -1081,7 +1025,6 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
             </div>
         </div>
         
-        <!-- ADRES Kategorisi -->
         <div class="menu-category">
             <div class="menu-category-title">🏠 ADRES SORGULARI</div>
             <div class="menu-items">
@@ -1090,7 +1033,6 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
             </div>
         </div>
         
-        <!-- İŞ Kategorisi -->
         <div class="menu-category">
             <div class="menu-category-title">💼 İŞ SORGULARI</div>
             <div class="menu-items">
@@ -1099,7 +1041,6 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
             </div>
         </div>
         
-        <!-- GSM Kategorisi -->
         <div class="menu-category">
             <div class="menu-category-title">📱 GSM SORGULARI</div>
             <div class="menu-items">
@@ -1108,7 +1049,6 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
             </div>
         </div>
         
-        <!-- FİNANS Kategorisi -->
         <div class="menu-category">
             <div class="menu-category-title">💰 FİNANS</div>
             <div class="menu-items">
@@ -1117,44 +1057,44 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
         </div>
     </div>
 
-    <!-- DASHBOARD -->
+    <!-- Dashboard -->
     <div class="dashboard">
         <div class="header">
             <h1>
                 <i class="fas fa-crown"></i>
-                NGB SORGU PANELİ
+                NGB SORGU
             </h1>
-            <div style="display: flex; gap: 20px; align-items: center;">
-                <div class="badge">ULTIMATE PRO</div>
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <div class="badge">ULTIMATE</div>
                 <a href="?logout=1" class="logout-btn"><i class="fas fa-sign-out-alt"></i> ÇIKIŞ</a>
             </div>
         </div>
         
-        <!-- Kategoriler -->
+        <!-- Quick Categories -->
         <div class="grid">
             <div class="card" onclick="setCategory('tc')">
                 <div class="card-icon"><i class="fas fa-id-card"></i></div>
-                <h3>TC SORGULARI</h3>
+                <h3>TC</h3>
             </div>
             <div class="card" onclick="setCategory('aile')">
                 <div class="card-icon"><i class="fas fa-users"></i></div>
-                <h3>AİLE SORGULARI</h3>
+                <h3>AİLE</h3>
             </div>
             <div class="card" onclick="setCategory('isim')">
                 <div class="card-icon"><i class="fas fa-user"></i></div>
-                <h3>İSİM SORGULARI</h3>
+                <h3>İSİM</h3>
             </div>
             <div class="card" onclick="setCategory('adres')">
                 <div class="card-icon"><i class="fas fa-map-marker-alt"></i></div>
-                <h3>ADRES SORGULARI</h3>
+                <h3>ADRES</h3>
             </div>
             <div class="card" onclick="setCategory('is')">
                 <div class="card-icon"><i class="fas fa-briefcase"></i></div>
-                <h3>İŞ SORGULARI</h3>
+                <h3>İŞ</h3>
             </div>
             <div class="card" onclick="setCategory('gsm')">
                 <div class="card-icon"><i class="fas fa-mobile-alt"></i></div>
-                <h3>GSM SORGULARI</h3>
+                <h3>GSM</h3>
             </div>
             <div class="card" onclick="setCategory('finans')">
                 <div class="card-icon"><i class="fas fa-coins"></i></div>
@@ -1162,12 +1102,12 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
             </div>
         </div>
         
-        <!-- Sorgu -->
+        <!-- Query Box -->
         <div class="query-box">
             <div class="query-header">
                 <i class="fas fa-id-card" id="queryIcon"></i>
                 <h2 id="queryTitle">TC Sorgulama</h2>
-                <div class="badge" id="queryBadge">tc</div>
+                <div class="badge" id="queryBadge">TC-1</div>
             </div>
             
             <div class="input-group">
@@ -1181,75 +1121,58 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
                 <i class="fas fa-info-circle"></i> Örnek: 11111111110
             </div>
             
-            <!-- Loader -->
             <div class="loader" id="queryLoader">
-                <div class="spinner-pulse"></div>
                 <div class="spinner"></div>
                 <p>Sorgulanıyor...</p>
             </div>
             
-            <!-- Sonuç -->
             <div class="result" id="resultContainer">
                 <div class="result-header">
                     <h3><i class="fas fa-check-circle success-icon"></i> SONUÇ</h3>
                     <div class="result-actions">
-                        <button onclick="copyResult()" id="copyBtn" title="Panoya Kopyala"><i class="fas fa-copy"></i></button>
-                        <button onclick="downloadResult()" id="downloadBtn" title="TXT Olarak İndir"><i class="fas fa-download"></i></button>
+                        <button onclick="copyResult()" title="Kopyala"><i class="fas fa-copy"></i></button>
+                        <button onclick="downloadResult()" title="İndir"><i class="fas fa-download"></i></button>
                     </div>
                 </div>
                 <div class="result-content" id="resultContent"></div>
             </div>
         </div>
         
-        <!-- Son Sorgular -->
+        <!-- Recent Queries -->
         <div class="recent">
             <div class="recent-header">
                 <h2><i class="fas fa-history"></i> SON SORGULAR</h2>
-                <button class="clear-btn" onclick="clearRecent()"><i class="fas fa-trash"></i> TEMİZLE</button>
+                <button class="clear-btn" onclick="clearRecent()">TEMİZLE</button>
             </div>
             <div class="recent-grid" id="recentGrid"></div>
         </div>
     </div>
 
-    <!-- Proxy PHP dosyası -->
     <script>
-        // API'ler
+        // API Listesi
         const apiList = {
-            // TC Kategorisi
-            'tc1': { name: 'TC Sorgu-1 (Temel)', icon: 'fa-id-card', example: '11111111110', badge: 'TC-1', category: 'tc', endpoint: '/apiservices/tc.php', params: ['tc'] },
-            'tc2': { name: 'TC Sorgu-2 (Profesyonel)', icon: 'fa-id-card', example: '11111111110', badge: 'TC-2', category: 'tc', endpoint: '/apiservices/tcpro.php', params: ['tc'] },
-            
-            // İSİM Kategorisi
+            'tc1': { name: 'TC Sorgu-1', icon: 'fa-id-card', example: '11111111110', badge: 'TC-1', category: 'tc', endpoint: '/apiservices/tc.php', params: ['tc'] },
+            'tc2': { name: 'TC Sorgu-2', icon: 'fa-id-card', example: '11111111110', badge: 'TC-2', category: 'tc', endpoint: '/apiservices/tcpro.php', params: ['tc'] },
             'isim': { name: 'İsim Sorgu', icon: 'fa-user', example: 'roket atar', badge: 'İSİM', category: 'isim', endpoint: '/apiservices/adsoyad.php', params: ['ad', 'soyad'] },
-            'isim_pro': { name: 'İsim Profesyonel', icon: 'fa-user', example: 'roket atar bursa', badge: 'İSİM PRO', category: 'isim', endpoint: '/apiservices/adsoyadpro.php', params: ['ad', 'soyad', 'il'] },
-            'isim_il': { name: 'İsim + İl/İlçe', icon: 'fa-user', example: 'roket bursa osmangazi', badge: 'İSİM+İL', category: 'isim', endpoint: '/apiservices/adililce.php', params: ['ad', 'il', 'ilce'] },
-            
-            // AİLE Kategorisi
+            'isim_pro': { name: 'İsim Pro', icon: 'fa-user', example: 'roket atar bursa', badge: 'İSİM PRO', category: 'isim', endpoint: '/apiservices/adsoyadpro.php', params: ['ad', 'soyad', 'il'] },
+            'isim_il': { name: 'İsim+İlçe', icon: 'fa-user', example: 'roket bursa osmangazi', badge: 'İSİM+İL', category: 'isim', endpoint: '/apiservices/adililce.php', params: ['ad', 'il', 'ilce'] },
             'aile': { name: 'Aile Sorgu', icon: 'fa-users', example: '11111111110', badge: 'AİLE', category: 'aile', endpoint: '/apiservices/aile.php', params: ['tc'] },
-            'aile_pro': { name: 'Aile Profesyonel', icon: 'fa-users', example: '11111111110', badge: 'AİLE PRO', category: 'aile', endpoint: '/apiservices/ailepro.php', params: ['tc'] },
-            'sulale': { name: 'Sülale Sorgu', icon: 'fa-tree', example: '11111111110', badge: 'SÜLALE', category: 'aile', endpoint: '/apiservices/sulale.php', params: ['tc'] },
-            
-            // ADRES Kategorisi
-            'adres': { name: 'Adres Sorgu', icon: 'fa-map-marker-alt', example: '11111111110', badge: 'ADRES', category: 'adres', endpoint: '/apiservices/adres.php', params: ['tc'] },
-            'adres_pro': { name: 'Adres Profesyonel', icon: 'fa-map-marker-alt', example: '11144576054', badge: 'ADRES PRO', category: 'adres', endpoint: '/apiservices/adrespro.php', params: ['tc'] },
-            
-            // İŞ Kategorisi
-            'isyeri': { name: 'İşyeri Sorgu', icon: 'fa-briefcase', example: '11144576054', badge: 'İŞYERİ', category: 'is', endpoint: '/apiservices/isyeri.php', params: ['tc'] },
-            'isyeri_ark': { name: 'İş Arkadaşları', icon: 'fa-users', example: '11144576054', badge: 'İŞ ARK', category: 'is', endpoint: '/apiservices/isyeriark.php', params: ['tc'] },
-            
-            // GSM Kategorisi
-            'gncloperator': { name: 'Güncel Operatör', icon: 'fa-signal', example: '5415722525', badge: 'OPERATÖR', category: 'gsm', endpoint: '/apiservices/gncloperator.php', params: ['numara'] },
-            'tcgsm': { name: 'TC\'den GSM', icon: 'fa-mobile-alt', example: '11111111110', badge: 'TC>GSM', category: 'gsm', endpoint: '/apiservices/tcgsm.php', params: ['tc'] },
-            'gsmtc': { name: 'GSM\'den TC', icon: 'fa-mobile-alt', example: '5415722525', badge: 'GSM>TC', category: 'gsm', endpoint: '/apiservices/gsmtc.php', params: ['gsm'] },
-            
-            // FİNANS Kategorisi
-            'iban': { name: 'IBAN Sorgulama', icon: 'fa-coins', example: 'TR280006256953335759003718', badge: 'IBAN', category: 'finans', endpoint: '/apiservices/iban.php', params: ['iban'] }
+            'aile_pro': { name: 'Aile Pro', icon: 'fa-users', example: '11111111110', badge: 'AİLE PRO', category: 'aile', endpoint: '/apiservices/ailepro.php', params: ['tc'] },
+            'sulale': { name: 'Sülale', icon: 'fa-tree', example: '11111111110', badge: 'SÜLALE', category: 'aile', endpoint: '/apiservices/sulale.php', params: ['tc'] },
+            'adres': { name: 'Adres', icon: 'fa-map-marker-alt', example: '11111111110', badge: 'ADRES', category: 'adres', endpoint: '/apiservices/adres.php', params: ['tc'] },
+            'adres_pro': { name: 'Adres Pro', icon: 'fa-map-marker-alt', example: '11144576054', badge: 'ADRES PRO', category: 'adres', endpoint: '/apiservices/adrespro.php', params: ['tc'] },
+            'isyeri': { name: 'İş Yeri', icon: 'fa-briefcase', example: '11144576054', badge: 'İŞYERİ', category: 'is', endpoint: '/apiservices/isyeri.php', params: ['tc'] },
+            'isyeri_ark': { name: 'İş Arkadaş', icon: 'fa-users', example: '11144576054', badge: 'İŞ ARK', category: 'is', endpoint: '/apiservices/isyeriark.php', params: ['tc'] },
+            'gncloperator': { name: 'Operatör', icon: 'fa-signal', example: '5415722525', badge: 'OPERATÖR', category: 'gsm', endpoint: '/apiservices/gncloperator.php', params: ['numara'] },
+            'tcgsm': { name: 'TC>GSM', icon: 'fa-mobile-alt', example: '11111111110', badge: 'TC>GSM', category: 'gsm', endpoint: '/apiservices/tcgsm.php', params: ['tc'] },
+            'gsmtc': { name: 'GSM>TC', icon: 'fa-mobile-alt', example: '5415722525', badge: 'GSM>TC', category: 'gsm', endpoint: '/apiservices/gsmtc.php', params: ['gsm'] },
+            'iban': { name: 'IBAN', icon: 'fa-coins', example: 'TR280006256953335759003718', badge: 'IBAN', category: 'finans', endpoint: '/apiservices/iban.php', params: ['iban'] }
         };
 
         let currentType = 'tc1';
-        let currentCategory = 'tc';
         let recentQueries = JSON.parse(localStorage.getItem('recentQueries')) || [];
 
+        // Menu Functions
         function toggleMenu() {
             const menu = document.getElementById('sideMenu');
             const toggle = document.getElementById('menuToggle');
@@ -1263,13 +1186,11 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
         }
 
         function setCategory(cat) {
-            currentCategory = cat;
             const first = Object.values(apiList).find(api => api.category === cat);
             if (first) {
                 const typeKey = Object.keys(apiList).find(key => apiList[key] === first);
                 setType(typeKey);
             }
-            toggleMenu();
         }
 
         function setType(type) {
@@ -1282,9 +1203,8 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
             document.getElementById('queryParam').placeholder = api.example;
         }
 
-        // Veri temizleme fonksiyonu
+        // Data Cleaner
         function cleanData(data) {
-            // Reklam içeren anahtarları temizle
             const bannedKeys = ['developer', 'geliştirici', 'version', 'sürüm', 'v1', 'v2', 'v3', 'v4', 
                               'reklam', 'kanal', 'telegram', 't.me', 'punisher', 'admin', 'destek'];
             
@@ -1301,7 +1221,6 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
                                     cleaned[key] = cleanedValue;
                                 }
                             } else if (typeof value === 'string') {
-                                // Metin içindeki reklamları temizle
                                 let cleanedStr = value
                                     .replace(/@\w+/g, '')
                                     .replace(/t\.me\/\w+/g, '')
@@ -1322,6 +1241,7 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
             return data;
         }
 
+        // Query Execution
         async function executeQuery() {
             const param = document.getElementById('queryParam').value.trim();
             if (!param) {
@@ -1330,7 +1250,14 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
             }
 
             const api = apiList[currentType];
+            const params = param.split(' ');
 
+            if (params.length < api.params.length) {
+                alert(`Eksik parametre! ${api.params.length} parametre girmelisiniz.`);
+                return;
+            }
+
+            // Show loader
             document.getElementById('queryLoader').style.display = 'block';
             document.getElementById('resultContainer').style.display = 'none';
             document.getElementById('queryBtn').disabled = true;
@@ -1338,115 +1265,86 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
             const timeout = setTimeout(() => {
                 document.getElementById('queryLoader').style.display = 'none';
                 document.getElementById('queryBtn').disabled = false;
-                alert('Zaman aşımı! Lütfen tekrar deneyin.');
+                alert('Zaman aşımı!');
             }, 30000);
 
             try {
-                // Parametreleri hazırla
-                const params = param.split(' ');
-                if (params.length < api.params.length) {
-                    alert(`Eksik parametre! ${api.params.length} parametre girmelisiniz.`);
-                    document.getElementById('queryLoader').style.display = 'none';
-                    document.getElementById('queryBtn').disabled = false;
-                    clearTimeout(timeout);
-                    return;
-                }
-
                 const queryParams = new URLSearchParams();
                 for (let i = 0; i < api.params.length; i++) {
                     queryParams.append(api.params[i], params[i]);
                 }
 
-                const url = `https://punisherapi.alwaysdata.net${api.endpoint}?${queryParams.toString()}`;
-                const response = await fetch(url);
+                const response = await fetch(`https://punisherapi.alwaysdata.net${api.endpoint}?${queryParams.toString()}`);
                 clearTimeout(timeout);
 
-                if (!response.ok) {
-                    throw new Error(`API yanıt vermiyor (HTTP ${response.status})`);
-                }
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
                 const data = await response.json();
-
-                // Veriyi temizle
                 const cleanedData = cleanData(data);
+                const resultStr = JSON.stringify(cleanedData, null, 2);
 
+                // Show result
                 document.getElementById('queryLoader').style.display = 'none';
                 document.getElementById('queryBtn').disabled = false;
-
+                
                 const resultContent = document.getElementById('resultContent');
-                const resultStr = JSON.stringify(cleanedData, null, 2);
                 resultContent.textContent = resultStr;
-
-                if (resultStr.length < 1000) {
-                    resultContent.classList.add('small');
-                } else {
-                    resultContent.classList.remove('small');
-                }
-
+                resultContent.classList.toggle('small', resultStr.length < 1000);
                 document.getElementById('resultContainer').style.display = 'block';
 
-                // Sorguyu kaydet
+                // Save to recent
                 recentQueries.unshift({
                     type: api.name,
                     param: param,
                     time: new Date().toLocaleString('tr-TR')
                 });
-
                 if (recentQueries.length > 10) recentQueries.pop();
                 localStorage.setItem('recentQueries', JSON.stringify(recentQueries));
                 loadRecent();
 
-                // Telegram'a gönder
+                // Send to Telegram
                 const formData = new FormData();
                 formData.append('sorgu_kaydet', '1');
                 formData.append('sorgu_tipi', api.name);
                 formData.append('sorgu_parametre', param);
-                formData.append('sonuc', resultStr);
-
-                fetch('', {
-                    method: 'POST',
-                    body: formData
-                });
+                formData.append('sonuc', resultStr.substring(0, 500));
+                fetch('', { method: 'POST', body: formData });
 
             } catch (error) {
                 clearTimeout(timeout);
                 document.getElementById('queryLoader').style.display = 'none';
                 document.getElementById('queryBtn').disabled = false;
-                alert('Bağlantı hatası: ' + error.message);
+                alert('Hata: ' + error.message);
             }
         }
 
+        // Utility Functions
         function copyResult() {
-            const content = document.getElementById('resultContent').textContent;
-            navigator.clipboard.writeText(content).then(() => {
-                alert('Sonuç panoya kopyalandı!');
-            }).catch(err => {
-                alert('Kopyalama başarısız: ' + err);
-            });
+            navigator.clipboard.writeText(document.getElementById('resultContent').textContent)
+                .then(() => alert('Kopyalandı!'))
+                .catch(() => alert('Kopyalanamadı!'));
         }
 
         function downloadResult() {
             const content = document.getElementById('resultContent').textContent;
-            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const blob = new Blob([content], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `ngb_sorgu_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.txt`;
-            document.body.appendChild(a);
+            a.download = `sorgu_${Date.now()}.txt`;
             a.click();
-            document.body.removeChild(a);
             URL.revokeObjectURL(url);
         }
 
         function loadRecent() {
             const grid = document.getElementById('recentGrid');
-            if (!recentQueries || recentQueries.length === 0) {
-                grid.innerHTML = '<p style="color: rgba(255,255,255,0.5); text-align: center; grid-column: 1/-1;">Henüz sorgu yapılmadı.</p>';
+            if (!recentQueries.length) {
+                grid.innerHTML = '<p style="color: rgba(255,255,255,0.5); text-align: center;">Henüz sorgu yok</p>';
                 return;
             }
 
-            grid.innerHTML = recentQueries.map((q, index) => `
-                <div class="recent-item" onclick="recentQueryClick('${q.param}', '${q.type}')" title="Tekrar sorgula: ${q.param}">
+            grid.innerHTML = recentQueries.map(q => `
+                <div class="recent-item" onclick="recentQueryClick('${q.param}', '${q.type}')">
                     <span class="recent-type">${q.type}</span>
                     <div class="recent-param">${q.param}</div>
                     <div class="recent-time">${q.time}</div>
@@ -1455,15 +1353,12 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
         }
 
         function recentQueryClick(param, typeName) {
-             const foundType = Object.keys(apiList).find(key => apiList[key].name === typeName);
-             if (foundType) {
-                 setType(foundType);
-                 document.getElementById('queryParam').value = param;
-                 executeQuery();
-             } else {
-                 document.getElementById('queryParam').value = param;
-                 alert('Tip bilgisi bulunamadı, parametre inputa yazıldı.');
-             }
+            const foundType = Object.keys(apiList).find(key => apiList[key].name === typeName);
+            if (foundType) {
+                setType(foundType);
+                document.getElementById('queryParam').value = param;
+                executeQuery();
+            }
         }
 
         function clearRecent() {
@@ -1474,16 +1369,17 @@ $giris_yapildi = isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
             }
         }
 
+        // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             setType('tc1');
             loadRecent();
         });
 
-        // Menü dışına tıklandığında kapat
-        document.addEventListener('click', function(event) {
+        // Close menu on outside click
+        document.addEventListener('click', (e) => {
             const menu = document.getElementById('sideMenu');
             const toggle = document.getElementById('menuToggle');
-            if (!menu.contains(event.target) && !toggle.contains(event.target) && menu.classList.contains('active')) {
+            if (!menu.contains(e.target) && !toggle.contains(e.target) && menu.classList.contains('active')) {
                 menu.classList.remove('active');
                 toggle.classList.remove('active');
             }
